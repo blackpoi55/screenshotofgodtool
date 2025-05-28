@@ -334,6 +334,109 @@ export default function ScreenshotTool() {
         });
         canvas.add(text);
     };
+    const addBlurRegion = async () => {
+        const fabricModule = await import("fabric");
+        const fabric = fabricModule.fabric ?? fabricModule;
+        const canvas = fabricRef.current;
+        if (!canvas || !canvas.backgroundImage) return;
+
+
+        const rect = new fabric.Rect({
+            left: canvas.width / 2 - 50,
+            top: canvas.height / 2 - 30,
+            width: 100,
+            height: 60,
+            selectable: true,
+            hasBorders: true,
+            hasControls: true,
+            strokeWidth: 1,
+            fill: new fabric.Pattern({
+                source: (() => {
+                    const patternCanvas = document.createElement("canvas");
+                    const size = 10; // 👈 ยิ่งเล็ก = ยิ่งถี่
+                    patternCanvas.width = size * 2;
+                    patternCanvas.height = size * 2;
+
+                    const ctx = patternCanvas.getContext("2d");
+
+                    ctx.fillStyle = "rgba(200, 200, 200, 0.9)";
+                    ctx.fillRect(0, 0, size, size);
+
+                    ctx.fillStyle = "rgba(100, 100, 100, 0.9)";
+                    ctx.fillRect(size, 0, size, size);
+
+                    ctx.fillStyle = "rgba(100, 100, 100, 0.9)";
+                    ctx.fillRect(0, size, size, size);
+
+                    ctx.fillStyle = "rgba(200, 200, 200, 0.9)";
+                    ctx.fillRect(size, size, size, size);
+
+                    return patternCanvas;
+                })(),
+                repeat: "repeat",
+            }),
+        });
+
+
+        canvas.add(rect);
+        canvas.setActiveObject(rect);
+
+        // 👉 เพิ่ม listener สำหรับ double click เพื่อเบลอ
+        rect.on("mousedblclick", async () => {
+            const left = rect.left ?? 0;
+            const top = rect.top ?? 0;
+            const width = rect.width ?? 100;
+            const height = rect.height ?? 60;
+
+            // ทำภาพซ้ำเฉพาะพื้นที่ที่เลือก
+            const imageEl = new Image();
+            imageEl.crossOrigin = "anonymous";
+            imageEl.src = canvasUrl;
+
+            imageEl.onload = () => {
+                const tempCanvas = document.createElement("canvas");
+                tempCanvas.width = width;
+                tempCanvas.height = height;
+                const ctx = tempCanvas.getContext("2d");
+                if (!ctx) return;
+
+                ctx.drawImage(
+                    imageEl,
+                    left / canvas.getZoom(),
+                    top / canvas.getZoom(),
+                    width / canvas.getZoom(),
+                    height / canvas.getZoom(),
+                    0,
+                    0,
+                    width,
+                    height
+                );
+
+                const croppedUrl = tempCanvas.toDataURL();
+
+                fabric.Image.fromURL(croppedUrl, (img) => {
+                    img.set({
+                        left,
+                        top,
+                        scaleX: 1,
+                        scaleY: 1,
+                        selectable: true,
+                    });
+
+                    // 👉 ใส่ filter เบลอ
+                    img.filters = [
+                        new fabric.Image.filters.Blur({ blur: 1 }),
+                        new fabric.Image.filters.Noise({ noise: 800 }),
+                    ];
+                    img.applyFilters();
+
+                    canvas.add(img);
+                    canvas.remove(rect);
+                    canvas.requestRenderAll();
+                });
+            };
+        });
+    };
 
     const addBox = async () => {
         const fabricModule = await import("fabric");
@@ -640,6 +743,13 @@ export default function ScreenshotTool() {
                                 title="เพิ่มลูกศร"
                             >
                                 ➡️
+                            </button>
+                            <button
+                                onClick={addBlurRegion}
+                                className="p-2 rounded bg-pink-500 text-white hover:bg-pink-600"
+                                title="เบลอ"
+                            >
+                                🌫️
                             </button>
 
                             {/* ปุ่ม: ลบวัตถุที่เลือก */}
