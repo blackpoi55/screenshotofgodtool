@@ -1,12 +1,16 @@
+"use client";
+import { useRouter } from "next/navigation";
+
 // app/page.tsx
 export default function Home() {
+  const router = useRouter()
   return (
     <main className="min-h-screen bg-gray-100 p-6 space-y-6 text-gray-800">
       {/* Navbar */}
       <nav className="bg-white shadow px-4 py-3 rounded flex justify-between items-center">
         <h1 className="text-xl font-bold">Next.js Tailwind UI</h1>
         <div className="space-x-4">
-          <a href="#" className="text-blue-600 hover:underline">Home</a>
+          <a onClick={()=>router.push("/manual")} className="text-blue-600 hover:underline">User Manual</a>
           <a href="https://docs.google.com/spreadsheets/d/1I1JJXCIk-fVTdO-wWS7U2l5GmLkWwRc4ag__Elvpo6s/edit?usp=sharing" className="text-blue-600 hover:underline">sheet</a>
           <a href="https://drive.google.com/drive/folders/1MCMwaJZGR5FnFJZVCXC4DsN4hY8ncpLS?usp=sharing" className="text-blue-600 hover:underline">drive</a>
         </div>
