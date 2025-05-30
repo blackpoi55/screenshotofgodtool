@@ -559,6 +559,38 @@ export default function ScreenshotTool() {
         link.download = `screenshot-${Date.now()}.png`;
         link.click();
     };
+
+    const handleCopy = () => {
+        const fabricCanvas = fabricRef.current;
+        if (!fabricCanvas) return;
+
+        // 🔁 ดึงเป็น <canvas> element ปกติ
+        const actualCanvas = fabricCanvas.getElement(); // ใช้ getElement() แทน
+
+        console.log("📸 แปลง canvas จริงเป็น blob...");
+        actualCanvas.toBlob((blob) => {
+            if (!blob) {
+                console.error("❌ ไม่สามารถสร้าง blob จาก canvas");
+                return;
+            }
+
+            console.log("✅ ได้ blob แล้ว", blob);
+            const item = new ClipboardItem({ "image/png": blob });
+
+            navigator.clipboard.write([item])
+                .then(() => {
+                    alert("✅ คัดลอกภาพสำเร็จแล้ว!");
+                })
+                .catch((err) => {
+                    console.error("❌ Clipboard Error:", err);
+                    alert("❌ ไม่สามารถคัดลอกภาพได้: " + err.message);
+                });
+        }, "image/png");
+    };
+
+
+
+
     const handleSendData = async (payload) => {
         try {
             setIsLoading(true); // เริ่มโหลด
@@ -635,7 +667,7 @@ export default function ScreenshotTool() {
 
             {isEditing && (
                 <div className="fixed inset-0 bg-black bg-opacity-60 z-[9998] flex flex-col items-center overflow-auto p-4 text-black">
-                    <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mb-2 w-full bg-white/90 backdrop-blur p-2 rounded shadow border max-w-4xl">
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mb-2 w-full bg-white/90 backdrop-blur p-2 rounded shadow border max-w-5xl">
                         <div className="flex items-center gap-2 flex-wrap justify-center">
                             {/* ช่องเลือกสี */}
                             <input
@@ -789,6 +821,14 @@ export default function ScreenshotTool() {
                         </div>
 
                         <div className="flex gap-2 mt-2 md:mt-0">
+                            <button
+                                onClick={handleCopy}
+                                className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-1"
+                            >
+                                📥
+                                copy
+                            </button>
+
                             <button
                                 onClick={handleSave}
                                 className="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 flex items-center gap-1"
