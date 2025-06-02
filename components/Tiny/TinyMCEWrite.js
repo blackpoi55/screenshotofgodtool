@@ -26,7 +26,7 @@ export default function TinyMCEWrite({ initialValue = "", onChange }) {
                     "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | ltr rtl",
                     "link image media table emoticons charmap codesample | fullscreen preview code | removeformat"
                 ].join(" | "),
-                 automatic_uploads: false,
+                automatic_uploads: false,
                 images_upload_handler: (blobInfo, success, failure) => {
                     try {
                         const base64 = "data:" + blobInfo.blob().type + ";base64," + blobInfo.base64();
