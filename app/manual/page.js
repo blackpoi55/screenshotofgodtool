@@ -2,7 +2,8 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import TinyMCERead from "@/components/Tiny/TinyMCERead";
-
+// npm install @tinymce/tinymce-react --legacy-peer-deps
+// npm i @tinymce/miniature --legacy-peer-deps
 const TinyMCEWrite = dynamic(() => import("@/components/Tiny/TinyMCEWrite"), {
   ssr: false,
 });
