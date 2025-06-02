@@ -590,41 +590,90 @@ export default function ScreenshotTool() {
 
 
 
+    // google drive sheet
+    // const handleSendData = async (payload) => {
+    //     try {
+    //         setIsLoading(true); // เริ่มโหลด
+
+    //         const res = await fetch('/api/send-report', {
+    //             method: 'POST',
+    //             body: JSON.stringify(payload),
+    //             headers: { 'Content-Type': 'application/json' },
+    //         });
+
+    //         const result = await res.json();
+    //         if (!res.ok) throw new Error(result.error);
+
+    //         Swal.fire({
+    //             icon: 'success',
+    //             title: 'ส่งข้อมูลสำเร็จ',
+    //             text: 'ระบบได้รับข้อมูลของคุณเรียบร้อยแล้ว',
+    //             timer: 2000,
+    //             showConfirmButton: false,
+    //         });
+
+    //         setSidePanelOpen(false);
+    //         resetScreenshotValue();
+    //     } catch (err) {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'เกิดข้อผิดพลาด',
+    //             text: err.message || 'ไม่สามารถส่งข้อมูลได้',
+    //         });
+    //     } finally {
+    //         setIsLoading(false); // หยุดโหลด
+    //     }
+    // };
 
     const handleSendData = async (payload) => {
         try {
-            setIsLoading(true); // เริ่มโหลด
+            // เริ่มโหลด
+            setIsLoading(true);
 
-            const res = await fetch('/api/send-report', {
-                method: 'POST',
-                body: JSON.stringify(payload),
-                headers: { 'Content-Type': 'application/json' },
+            const response = await fetch("https://api-h-series.telecorp.co.th/api/bugreport", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload), // ส่ง payload ไปยัง API
             });
 
-            const result = await res.json();
-            if (!res.ok) throw new Error(result.error);
+            const result = await response.json();
 
-            Swal.fire({
-                icon: 'success',
-                title: 'ส่งข้อมูลสำเร็จ',
-                text: 'ระบบได้รับข้อมูลของคุณเรียบร้อยแล้ว',
-                timer: 2000,
-                showConfirmButton: false,
-            });
+            if (!result.error) {
+                console.log("✅ ส่งสำเร็จ:", result);
 
-            setSidePanelOpen(false);
-            resetScreenshotValue();
+                Swal.fire({
+                    icon: "success",
+                    title: "ส่งข้อมูลสำเร็จ",
+                    text: "ระบบได้รับข้อมูลของคุณเรียบร้อยแล้ว",
+                    confirmButtonText: "ตกลง",
+                    showConfirmButton: false,
+                    timer: 2000,
+                });
+
+                setSidePanelOpen(false);
+                resetScreenshotValue();
+            } else {
+                console.error("❌ ส่งข้อมูลล้มเหลว:", result.error);
+                Swal.fire({
+                    icon: "error",
+                    title: "ส่งข้อมูลไม่สำเร็จ",
+                    text: "กรุณาลองใหม่อีกครั้งหรือติดต่อผู้ดูแลระบบ",
+                    confirmButtonText: "ปิด",
+                });
+            }
         } catch (err) {
             Swal.fire({
-                icon: 'error',
-                title: 'เกิดข้อผิดพลาด',
-                text: err.message || 'ไม่สามารถส่งข้อมูลได้',
+                icon: "error",
+                title: "เกิดข้อผิดพลาด",
+                text: err.message || "ไม่สามารถส่งข้อมูลได้",
             });
         } finally {
-            setIsLoading(false); // หยุดโหลด
+            // หยุดโหลด
+            setIsLoading(false);
         }
     };
-
     const resetScreenshotValue = () => {
         setscreenshotValue({
             title: "",
@@ -966,8 +1015,8 @@ export default function ScreenshotTool() {
                             setscreenshotValue((prev) => ({ ...prev, comment: e.target.value }))
                         }
                     />
-
-                    <button
+                    {/* google drive sheet */}
+                    {/* <button
                         disabled={isLoading}
                         className={`mt-2 px-4 py-2 rounded w-full text-white ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
                         onClick={() => {
@@ -986,9 +1035,25 @@ export default function ScreenshotTool() {
                         }}
                     >
                         {isLoading ? '⏳ กำลังส่ง...' : '📩 ส่ง'}
+                    </button> */}
+
+                    <button
+                        disabled={isLoading}
+                        className={`mt-2 px-4 py-2 rounded w-full text-white ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+                        onClick={() => {
+                            const payload = {
+                                ...screenshotValue,
+                                module: window.location.href,
+                                screenshotpath: canvasUrl,
+                                bucode: "devtest"
+                            };
+                            console.log("📩 ส่งข้อมูล:", payload);
+                            handleSendData(payload)
+                            // setSidePanelOpen(false);
+                        }}
+                    >
+                        {isLoading ? '⏳ กำลังส่ง...' : '📩 ส่ง'}
                     </button>
-
-
 
                     <button
                         className="mt-2 bg-red-600 text-white px-4 py-2 rounded w-full hover:bg-red-700"

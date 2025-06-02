@@ -1,8 +1,8 @@
 'use client'
 
-// import { getbugreport, updatebugstatus } from "@/action/api"
-// import Baselayout from "@/components/Baselayout/Baselayout"
-// import { LoadingProvider } from "@/components/Tool/LoadingContext "
+import { getbugreport, updatebugstatus } from "@/action/api"
+import Baselayout from "@/components/Baselayout/Baselayout"
+import { LoadingProvider } from "@/components/Tool/LoadingContext "
 import { useEffect, useState } from "react"
 
 function page() {
@@ -19,21 +19,42 @@ function page() {
   }, [])
 
   const refresh = async () => {
-    // let data = await getbugreport()
-    // if (!data.error && data.data) {
-    //   setCases(data.data)
-    // }
-  }
+    const response = await fetch("https://api-h-series.telecorp.co.th/api/bugreport/getbyCode/devtest", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+
+    const result = await response.json();
+
+    if (Array.isArray(result.data)) {
+      setCases(result.data);
+    } else {
+      console.warn("⚠️ result.data is not array:", result.data);
+      setCases([]);
+    }
+  };
+
 
   const handleStatusUpdate = async (data, newStatus) => {
-    // const res = await updatebugstatus({ status: newStatus }, data.id)
-    // if (!res.error) {
-    //   refresh()
-    //   setIsModalOpen(false)
-    // } else {
-    //   alert("อัปเดตสถานะไม่สำเร็จ")
-    // }
-  }
+    // const res = await updatebugstatus({ status: newStatus }, data.id);
+    const response = await fetch("https://api-h-series.telecorp.co.th/api/bugreport/" + data.id, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status: newStatus }), // ส่ง payload ไปยัง API
+    });
+
+    const result = await response.json();
+    if (result) {
+      refresh();
+      setIsModalOpen(false);
+    } else {
+      alert("อัปเดตสถานะไม่สำเร็จ");
+    }
+  };
 
   const getStatusClass = (status) => {
     switch (status) {
@@ -87,8 +108,8 @@ function page() {
   };
 
   return (
-    // <Baselayout>
-    //   <LoadingProvider>
+    <Baselayout>
+      <LoadingProvider>
         <div className="flex flex-col gap-6 p-6 bg-gray-50 min-h-screen">
           <h1 className="text-3xl font-bold text-gray-800">📊 Dashboard Report Case</h1>
 
@@ -259,8 +280,8 @@ function page() {
           )}
 
         </div>
-    //   </LoadingProvider>
-    // </Baselayout>
+      </LoadingProvider>
+    </Baselayout>
   )
 }
 
