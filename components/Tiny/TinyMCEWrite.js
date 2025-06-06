@@ -1,17 +1,26 @@
 "use client";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 
 const TINYMCE_API_KEY = "9rv7sk2supns77ueu5ufbwpwl5ihjtapi3a1r3p3rgxrct5l";
 
 export default function TinyMCEWrite({ initialValue = "", onChange }) {
     const editorRef = useRef(null);
+    const [value, setValue] = useState(initialValue);
+
+    useEffect(() => {
+        setValue(initialValue);
+    }, [initialValue]);
 
     return (
         <Editor
             apiKey={TINYMCE_API_KEY}
+            value={value}
             onInit={(evt, editor) => (editorRef.current = editor)}
-            initialValue={initialValue}
+            onEditorChange={(content) => {
+                setValue(content);
+                if (onChange) onChange(content);
+            }}
             init={{
                 height: 600,
                 menubar: "file edit view insert format tools table help",
@@ -26,30 +35,52 @@ export default function TinyMCEWrite({ initialValue = "", onChange }) {
                     "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | ltr rtl",
                     "link image media table emoticons charmap codesample | fullscreen preview code | removeformat"
                 ].join(" | "),
+                font_family_formats: `
+                    Sarabun=Sarabun,Helvetica,Arial,sans-serif;
+                    Arial=Arial,Helvetica,sans-serif;
+                    Courier New=Courier New,Courier,monospace;
+                    Georgia=Georgia,serif;
+                    Times New Roman=Times New Roman,Times,serif;
+                    Verdana=Verdana,Geneva,sans-serif
+                `,
                 automatic_uploads: false,
                 images_upload_handler: (blobInfo, success, failure) => {
                     try {
                         const base64 = "data:" + blobInfo.blob().type + ";base64," + blobInfo.base64();
-
-                        // ✅ ใส่ timeout ให้แน่ใจว่ามันรอโหลดภาพ
                         setTimeout(() => {
                             success(base64);
-                        }, 100); // หรือ 0 ก็ได้
+                        }, 100);
                     } catch (err) {
                         failure("เกิดข้อผิดพลาด: ไม่สามารถแสดงภาพได้");
                     }
                 },
-
                 branding: false,
                 content_style: `
-                    body { font-family:Helvetica,Arial,sans-serif; font-size:16px; padding: 1rem; }
-                    img { max-width: 100%; height: auto; }
-                    table { border-collapse: collapse; width: 100%; }
-                    th, td { border: 1px solid #ccc; padding: 0.5rem; }
-                `,
-            }}
-            onEditorChange={(content) => {
-                if (onChange) onChange(content);
+  @font-face {
+    font-family: 'Sarabun';
+    src: url('/fonts/sarabun/Sarabun-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Sarabun';
+    src: url('/fonts/sarabun/Sarabun-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Sarabun';
+    src: url('/fonts/sarabun/Sarabun-Italic.ttf') format('truetype');
+    font-weight: 400;
+    font-style: italic;
+  }
+  body {
+    font-family: 'Sarabun', Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    padding: 1rem;
+  }
+`,
+
             }}
         />
     );
