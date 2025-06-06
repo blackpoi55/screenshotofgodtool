@@ -56,6 +56,7 @@ export default function TinyMCEWrite({ initialValue = "", onChange }) {
                 },
                 branding: false,
                 content_style: `
+ 
   @font-face {
     font-family: 'Sarabun';
     src: url('/fonts/sarabun/Sarabun-Regular.ttf') format('truetype');
@@ -73,13 +74,9 @@ export default function TinyMCEWrite({ initialValue = "", onChange }) {
     src: url('/fonts/sarabun/Sarabun-Italic.ttf') format('truetype');
     font-weight: 400;
     font-style: italic;
-  }
-  body {
-    font-family: 'Sarabun', Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    padding: 1rem;
-  }
-`,
+  } 
+`
+                ,
 
             }}
         />
