@@ -92,8 +92,8 @@ function page() {
     })
 
   const countByStatus = (status) => cases.filter((c) => c.status === status).length
-  const getSeverityClass = (severity) => {
-    switch (severity) {
+  const getpriorityClass = (priority) => {
+    switch (priority) {
       case "ต่ำ":
         return "bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold";
       case "ปานกลาง":
@@ -185,7 +185,7 @@ function page() {
                       })}
                     </td>
                     <td className="p-3">
-                      <span className={getSeverityClass(item.severity)}>{item.severity || "-"}</span>
+                      <span className={getpriorityClass(item.priority)}>{item.priority || "-"}</span>
                     </td>
                     <td className="p-3">{item.title}</td>
                     <td className="p-3">{item.reporter}</td>
@@ -231,7 +231,7 @@ function page() {
                   </div>
                   <div className="w-full md:w-1/2 space-y-4">
                     <h2 className="text-2xl font-bold text-gray-800">{selectedCase.title}</h2>
-                    <p><strong>ระดับความรุนแรง:</strong> <span className={getSeverityClass(selectedCase.severity)}>{selectedCase.severity || "-"}</span></p>
+                    <p><strong>ระดับความรุนแรง:</strong> <span className={getpriorityClass(selectedCase.priority)}>{selectedCase.priority || "-"}</span></p>
                     <p><strong>สถานะ:</strong> <span className={getStatusClass(selectedCase.status)}>{selectedCase.status}</span></p>
                     <div className="flex gap-3">
                       <button

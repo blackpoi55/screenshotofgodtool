@@ -24,7 +24,7 @@ export default function ScreenshotTool() {
         "url": "",
         "reporter": "",
         "screenshotpath": "",
-        "severity": "ต่ำ",
+        "priority": "ต่ำ",
     });
 
 
@@ -684,7 +684,7 @@ export default function ScreenshotTool() {
             url: "",
             reporter: "",
             screenshotpath: "",
-            severity: "ต่ำ",
+            priority: "ต่ำ",
             assignees: [], // ✅ ใส่ตรงนี้ด้วย
         });
     };
@@ -974,9 +974,9 @@ export default function ScreenshotTool() {
                         <label className="block mb-1 font-medium">ระดับความรุนแรงของปัญหา</label>
                         <select
                             className="w-full border rounded p-2"
-                            value={screenshotValue.severity}
+                            value={screenshotValue.priority}
                             onChange={(e) =>
-                                setscreenshotValue((prev) => ({ ...prev, severity: e.target.value }))
+                                setscreenshotValue((prev) => ({ ...prev, priority: e.target.value }))
                             }
                         >
                             <option value="ต่ำ">🟢 ต่ำ (Minor)</option>
