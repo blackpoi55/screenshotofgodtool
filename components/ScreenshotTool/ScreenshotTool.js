@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import Swal from "sweetalert2";
+import { bucode } from "@/config";
 
 
 export default function ScreenshotTool() {
@@ -1047,7 +1048,7 @@ export default function ScreenshotTool() {
                                 ...screenshotValue,
                                 module: window.location.href,
                                 screenshotpath: canvasUrl,
-                                bucode: "devtest"
+                                bucode: bucode
                             };
                             console.log("📩 ส่งข้อมูล:", payload);
                             handleSendData(payload)

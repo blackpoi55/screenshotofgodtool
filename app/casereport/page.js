@@ -1,5 +1,6 @@
 'use client'
 
+import { bucode } from "@/config"
 import { useEffect, useState } from "react"
 const statusOptions = [
   { label: "ทั้งหมด", value: "" },
@@ -26,7 +27,7 @@ function page() {
   }, [])
 
   const refresh = async () => {
-    const response = await fetch("https://api-h-series.telecorp.co.th/api/bugreport/getbyCode/devtest", {
+    const response = await fetch("https://api-h-series.telecorp.co.th/api/bugreport/getbyCode/"+bucode, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

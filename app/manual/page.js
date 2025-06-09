@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Swal from "sweetalert2";
+import { bucode } from "@/config";
 
 const TinyMCEWrite = dynamic(() => import("@/components/Tiny/TinyMCEWrite"), {
   ssr: false,
@@ -12,8 +13,7 @@ export default function ManualPage() {
   const [manuals, setManuals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState({ open: false, mode: "add", data: null });
-  const [formData, setFormData] = useState({ name: "", detail: "", bucode: "", createby: "" });
-  const bucode = "devtest";
+  const [formData, setFormData] = useState({ name: "", detail: "", bucode: "", createby: "" }); 
 
   const fetchManuals = async () => {
     try {
