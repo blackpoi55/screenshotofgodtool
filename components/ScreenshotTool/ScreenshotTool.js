@@ -350,6 +350,7 @@ export default function ScreenshotTool() {
             hasBorders: true,
             hasControls: true,
             strokeWidth: 1,
+            strokeUniform: true,
             fill: new fabric.Pattern({
                 source: (() => {
                     const patternCanvas = document.createElement("canvas");
@@ -454,6 +455,7 @@ export default function ScreenshotTool() {
             originX: "center",
             originY: "center",
             selectable: true,
+            strokeUniform: true,
         });
         canvas.add(rect);
     };
