@@ -1,6 +1,6 @@
 // app/manual/view/page.jsx
-import { Suspense } from "react";
-import ManualViewClient from "./ManualViewClient";
+import ManualViewClient from "@/components/Tiny/ManualViewClient";
+import { Suspense } from "react"; 
 
 export default function Page() {
   return (
