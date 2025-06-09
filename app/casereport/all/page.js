@@ -1,6 +1,6 @@
 'use client'
-
 import { useEffect, useState } from "react"
+// ✅ Options ที่แยกไว้ด้านบน
 const statusOptions = [
   { label: "ทั้งหมด", value: "" },
   { label: "🟡 pending", value: "pending" },
@@ -12,9 +12,17 @@ const sortOptions = [
   { label: "ล่าสุด ⬇️", value: "createdat-desc" },
   { label: "เก่าสุด ⬆️", value: "createdat-asc" }
 ]
+
+const projectOptions = [
+  { label: "ทุกโปรเจค", value: "" },
+  { label: "Cryoviva Form", value: "form01" },
+  { label: "H-series New", value: "CarevitaAI" },
+  { label: "Test", value: "devtest" }
+]
 function page() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("pending")
+  const [projectFilter, setprojectFilter] = useState("")
   const [sortBy, setSortBy] = useState("createdat-desc")
   const [selectedCase, setSelectedCase] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -26,7 +34,7 @@ function page() {
   }, [])
 
   const refresh = async () => {
-    const response = await fetch("https://api-h-series.telecorp.co.th/api/bugreport/getbyCode/devtest", {
+    const response = await fetch("https://api-h-series.telecorp.co.th/api/bugreport", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -87,7 +95,8 @@ function page() {
           c.url.toLowerCase().includes(search) ||
           c.reporter.toLowerCase().includes(search) ||
           c.status.toLowerCase().includes(search)) &&
-        (statusFilter === "" || c.status === statusFilter)
+        (statusFilter === "" || c.status === statusFilter) &&
+        (projectFilter === "" || c.bucode === projectFilter)
       )
     })
     .sort((a, b) => {
@@ -141,6 +150,15 @@ function page() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="p-3 border border-gray-300 rounded-lg shadow-sm w-full md:w-1/2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+        <select
+          value={projectFilter}
+          onChange={(e) => setprojectFilter(e.target.value)}
+          className="p-3 border border-gray-300 rounded-lg shadow-sm w-full md:w-1/4 focus:outline-none"
+        >
+          {projectOptions.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
 
         <select
           value={statusFilter}
@@ -168,6 +186,7 @@ function page() {
           <thead>
             <tr className="bg-blue-100 text-gray-700 text-sm uppercase">
               <th className="p-3 text-left">วันที่แจ้ง</th>
+              <th className="p-3 text-left">โปรเจค</th>
               <th className="p-3 text-left">ความรุนแรง</th>
               <th className="p-3 text-left">ชื่อเคส</th>
               <th className="p-3 text-left">ผู้รายงาน</th>
@@ -191,6 +210,7 @@ function page() {
                     second: "2-digit"
                   })}
                 </td>
+                <td className="p-3">{item.bucode}</td>
                 <td className="p-3">
                   <span className={getpriorityClass(item.priority)}>{item.priority || "-"}</span>
                 </td>
