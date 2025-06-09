@@ -95,63 +95,70 @@ export default function ManualPage() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-gray-50 dark:bg-gray-900 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">📚 รายการคู่มือทั้งหมด</h1>
-        <button
-          onClick={() => openModal("add")}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow"
-        >
-          ➕ เพิ่มคู่มือ
-        </button>
-      </div>
+  <div className="p-8 max-w-7xl mx-auto bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800 min-h-screen">
+    <div className="flex justify-between items-center mb-8">
+      <h1 className="text-3xl font-extrabold text-indigo-800 dark:text-white tracking-tight">📚 รายการคู่มือทั้งหมด</h1>
+      <button
+        onClick={() => openModal("add")}
+        className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold px-5 py-2 rounded-xl shadow-lg transition-transform transform hover:scale-105"
+      >
+        ➕ เพิ่มคู่มือ
+      </button>
+    </div>
 
-      {loading ? (
-        <div className="flex justify-center items-center h-40">
-          <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500"></div>
-          <span className="ml-4 text-gray-600 dark:text-gray-300">กำลังโหลดข้อมูล...</span>
-        </div>
-      ) : (
-        <div className="overflow-x-auto shadow rounded-lg">
-          <table className="min-w-full border border-gray-300 dark:border-gray-700">
-            <thead className="bg-gray-200 dark:bg-gray-700">
-              <tr>
-                <th className="p-3 text-left text-gray-800 dark:text-white">ชื่อ</th>
-                <th className="p-3 text-left text-gray-800 dark:text-white">BU Code</th>
-                <th className="p-3 text-left text-gray-800 dark:text-white">ผู้สร้าง</th>
-                <th className="p-3 text-left text-gray-800 dark:text-white">วันที่สร้าง</th>
-                <th className="p-3 text-left text-gray-800 dark:text-white">จัดการ</th>
+    {loading ? (
+      <div className="flex justify-center items-center h-40">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-500"></div>
+        <span className="ml-4 text-lg font-medium text-gray-700 dark:text-gray-300">กำลังโหลดข้อมูล...</span>
+      </div>
+    ) : (
+      <div className="overflow-x-auto rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+        <table className="min-w-full text-sm">
+          <thead className="bg-indigo-100 dark:bg-gray-700 text-indigo-900 dark:text-white">
+            <tr>
+              <th className="p-4 text-left">ชื่อ</th>
+              <th className="p-4 text-left">BU Code</th>
+              <th className="p-4 text-left">ผู้สร้าง</th>
+              <th className="p-4 text-left">วันที่สร้าง</th>
+              <th className="p-4 text-left">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            {manuals.map((m) => (
+              <tr key={m.uid} className="hover:bg-indigo-50 dark:hover:bg-gray-800 transition">
+                <td className="p-4 text-gray-800 dark:text-gray-100">{m.name}</td>
+                <td className="p-4 text-gray-700 dark:text-gray-300">{m.bucode}</td>
+                <td className="p-4 text-gray-700 dark:text-gray-300">{m.createby}</td>
+                <td className="p-4 text-gray-700 dark:text-gray-300">{new Date(m.createat).toLocaleString()}</td>
+                <td className="p-4 space-x-2">
+                  <a
+                    href={`/manual/view?id=${m.uid}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-full text-sm shadow-sm transition"
+                  >
+                    👁️ ดู
+                  </a>
+                  <button
+                    onClick={() => openModal("edit", m)}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1.5 rounded-full text-sm shadow-sm transition"
+                  >
+                    ✏️ แก้ไข
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-800">
-              {manuals.map((m) => (
-                <tr key={m.uid} className="hover:bg-gray-50 dark:hover:bg-gray-600">
-                  <td className="p-3 border-t border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white">{m.name}</td>
-                  <td className="p-3 border-t border-gray-300 dark:border-gray-700">{m.bucode}</td>
-                  <td className="p-3 border-t border-gray-300 dark:border-gray-700">{m.createby}</td>
-                  <td className="p-3 border-t border-gray-300 dark:border-gray-700">{new Date(m.createat).toLocaleString()}</td>
-                  <td className="p-3 border-t border-gray-300 dark:border-gray-700 space-x-2">
-                    <a
-                      href={`/manual/view?id=${m.uid}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded inline-block"
-                    >
-                      👁️ ดู
-                    </a>
-                    <button onClick={() => openModal("edit", m)} className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">✏️ แก้ไข</button>
-                  </td>
-                </tr>
-              ))}
-              {manuals.length === 0 && (
-                <tr>
-                  <td colSpan="5" className="text-center py-6 text-gray-500 dark:text-gray-400">ไม่มีข้อมูลคู่มือ</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+            ))}
+            {manuals.length === 0 && (
+              <tr>
+                <td colSpan="5" className="text-center py-8 text-gray-500 dark:text-gray-400 text-base font-medium">
+                  ไม่มีข้อมูลคู่มือ
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    )}
 
       {modal.open && modal.mode !== "view" && (
         <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50">
@@ -169,7 +176,8 @@ export default function ManualPage() {
             />
 
             <label className="block mb-2 text-gray-700 dark:text-gray-200">รายละเอียด</label>
-            <div className=" w-[900px]">
+            {/* <div className=" w-[900px]"> */}
+            <div className=" w-[1200px]">
               <TinyMCEWrite
                 initialValue={formData.detail}
                 onChange={(val) => setFormData({ ...formData, detail: val })}

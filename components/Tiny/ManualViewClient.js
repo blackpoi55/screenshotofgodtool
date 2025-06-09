@@ -1,4 +1,3 @@
-// app/manual/view/ManualViewClient.jsx
 "use client";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -39,39 +38,61 @@ export default function ManualViewClient() {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-100 dark:bg-gray-900">
-      <aside className="w-64 bg-white dark:bg-gray-800 p-4 border-r dark:border-gray-700">
-        <h2 className="text-xl font-semibold mb-4 text-gray-700 dark:text-white">📚 คู่มือทั้งหมด</h2>
-        <div className="flex flex-col gap-2">
+    <div className="min-h-screen flex bg-gradient-to-tr from-indigo-100 to-blue-50 dark:from-gray-900 dark:to-gray-800 text-black">
+      {/* Sidebar */}
+      <aside className="w-80 bg-white/70 dark:bg-white/10 backdrop-blur-md p-6 border-r border-blue-200 dark:border-gray-700 shadow-2xl z-10">
+        <h2 className="text-2xl font-bold mb-6 text-blue-800 dark:text-white flex items-center gap-2">
+          📚 <span>คู่มือระบบ</span>
+        </h2>
+        <div className="flex flex-col gap-3 overflow-y-auto max-h-[80vh] pr-1 custom-scroll">
           {manuals.map((m) => (
             <button
               key={m.uid}
               onClick={() => getData(m.uid)}
-              className={`w-full text-left px-4 py-2 rounded-lg transition-all duration-200 border 
+              className={`text-left px-5 py-3 rounded-xl font-semibold text-sm transition-all border relative group overflow-hidden
                 ${value?.uid === m.uid
-                  ? "bg-blue-600 text-white border-blue-600 shadow"
-                  : "bg-gray-100 text-gray-800 hover:bg-blue-100 border-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-blue-900"}`}
+                  ? "bg-gradient-to-r from-blue-600 to-indigo-500 text-white shadow-lg border-blue-600"
+                  : "bg-white dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-blue-100 dark:hover:bg-gray-700 border-gray-300"}
+              `}
             >
-              {m.name}
+              <span className="z-10 relative">{m.name}</span>
+              {value?.uid === m.uid && (
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white font-bold">★</span>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl" />
             </button>
           ))}
         </div>
       </aside>
 
-      <main className="flex-1 p-6 overflow-y-auto">
-        <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 max-w-4xl mx-auto">
+      {/* Content */}
+      <main className="flex-1 px-10 py-12 overflow-y-auto">
+        <div className="max-w-7xl mx-auto bg-white p-10 rounded-3xl shadow-2xl border border-blue-200 relative animate-fadeIn">
           {value ? (
             <div
-              className="prose prose-sm lg:prose-base max-w-none dark:prose-invert"
+              className="prose prose-lg max-w-none dark:prose-invert prose-indigo transition-all duration-300"
               dangerouslySetInnerHTML={{ __html: value.detail }}
             />
           ) : (
-            <p className="text-gray-500 dark:text-gray-400 text-center py-8 animate-pulse">
-              กำลังโหลดข้อมูล...
-            </p>
+            <div className="space-y-3 animate-pulse">
+              <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-3/4" />
+              <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-full" />
+              <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-5/6" />
+              <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-2/3" />
+            </div>
           )}
         </div>
       </main>
+
+      <style jsx>{`
+        .custom-scroll::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+          background: rgba(100, 116, 139, 0.4);
+          border-radius: 8px;
+        }
+      `}</style>
     </div>
   );
 }
