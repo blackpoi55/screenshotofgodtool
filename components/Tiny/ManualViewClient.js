@@ -8,10 +8,10 @@ export default function ManualViewClient() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const [manuals, setManuals] = useState([]);
-
+  const [projectFilter, setprojectFilter] = useState()
   useEffect(() => {
     fetchManuals();
-  }, []);
+  }, [projectFilter]);
 
   useEffect(() => {
     if (id) getData(id);
@@ -19,7 +19,7 @@ export default function ManualViewClient() {
 
   const fetchManuals = async () => {
     try {
-      const res = await fetch("https://api-h-series.telecorp.co.th/api/manual/getbyCode/" + bucode);
+      const res = await fetch("https://api-h-series.telecorp.co.th/api/manual/getbyCode/" + projectFilter);
       const data = await res.json();
 
       const sorted = (data.data || []).sort((a, b) => {
@@ -37,6 +37,7 @@ export default function ManualViewClient() {
       const res = await fetch(`https://api-h-series.telecorp.co.th/api/manual/${manualId}`);
       const data = await res.json();
       setValue(data.data);
+      setprojectFilter(data?.data?.bucode)
     } catch (error) {
       console.error("โหลดข้อมูลล้มเหลว:", error);
     }

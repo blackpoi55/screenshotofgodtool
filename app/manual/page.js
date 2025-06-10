@@ -8,34 +8,39 @@ import { bucode } from "@/config";
 const TinyMCEWrite = dynamic(() => import("@/components/Tiny/TinyMCEWrite"), {
   ssr: false,
 });
-
+const projectOptions = [
+  // { label: "ทุกโปรเจค", value: "" },
+  { label: "Cryoviva Form", value: "form01" },
+  { label: "H-series New", value: "CarevitaAI" },
+  { label: "Test", value: "devtest" }
+]
 export default function ManualPage() {
   const [manuals, setManuals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState({ open: false, mode: "add", data: null });
   const [formData, setFormData] = useState({ name: "", detail: "", bucode: "", createby: "" });
-
+  const [projectFilter, setprojectFilter] = useState(bucode)
   const fetchManuals = async () => {
-  try {
-    const res = await fetch("https://api-h-series.telecorp.co.th/api/manual/getbyCode/" + bucode);
-    const data = await res.json();
+    try {
+      const res = await fetch("https://api-h-series.telecorp.co.th/api/manual/getbyCode/" + projectFilter);
+      const data = await res.json();
 
-    const sorted = (data.data || []).sort((a, b) => {
-      return new Date(b.createat).getTime() - new Date(a.createat).getTime(); // เรียงจากใหม่ → เก่า
-    });
+      const sorted = (data.data || []).sort((a, b) => {
+        return new Date(b.createat).getTime() - new Date(a.createat).getTime(); // เรียงจากใหม่ → เก่า
+      });
 
-    setManuals(sorted);
-  } catch (err) {
-    console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", err);
-  } finally {
-    setLoading(false);
-  }
-};
+      setManuals(sorted);
+    } catch (err) {
+      console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   useEffect(() => {
     fetchManuals();
-  }, []);
+  }, [projectFilter]);
 
   const openModal = (mode, data = null) => {
     setModal({ open: true, mode, data });
@@ -43,11 +48,11 @@ export default function ManualPage() {
       setFormData({
         name: data.name || "",
         detail: data.detail || "",
-        bucode: data.bucode || bucode,
+        bucode: data.bucode || projectFilter,
         createby: data.createby || "",
       });
     } else {
-      setFormData({ name: "", detail: "", bucode: bucode, createby: "" });
+      setFormData({ name: "", detail: "", bucode: projectFilter, createby: "" });
     }
   };
 
@@ -130,20 +135,36 @@ export default function ManualPage() {
       }
     }
   };
- 
+
   return (
     <div className="p-10 max-w-full mx-auto bg-gradient-to-br from-indigo-100 via-pink-50 to-purple-100 dark:from-gray-900 dark:to-gray-800 min-h-screen text-gray-800 dark:text-white">
-      <div className="flex justify-between items-center mb-10">
-        <h1 className="text-4xl font-extrabold text-purple-700 dark:text-white tracking-tight flex items-center gap-2">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+        {/* Title */}
+        <h1 className="text-3xl md:text-4xl font-extrabold text-purple-700 dark:text-white tracking-tight flex items-center gap-2">
           📚 <span>รายการคู่มือทั้งหมด</span>
         </h1>
-        <button
-          onClick={() => openModal("add")}
-          className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-semibold px-6 py-2.5 rounded-xl shadow-xl transition-transform transform hover:scale-105"
-        >
-          ➕ เพิ่มคู่มือ
-        </button>
+
+        {/* Filter + Button */}
+        <div className="flex flex-col sm:flex-row items-stretch gap-3 w-full md:w-auto">
+          <select
+            value={projectFilter}
+            onChange={(e) => setprojectFilter(e.target.value)}
+            className="p-3 border border-gray-300 rounded-lg shadow-sm w-full sm:w-60 focus:outline-none text-black"
+          >
+            {projectOptions.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+
+          <button
+            onClick={() => openModal("add")}
+            className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-semibold px-6 py-2.5 rounded-xl shadow-xl transition-transform transform hover:scale-105 w-full sm:w-auto"
+          >
+            ➕ เพิ่มคู่มือ
+          </button>
+        </div>
       </div>
+
 
       {loading ? (
         <div className="flex justify-center items-center h-40">
