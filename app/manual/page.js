@@ -16,16 +16,22 @@ export default function ManualPage() {
   const [formData, setFormData] = useState({ name: "", detail: "", bucode: "", createby: "" });
 
   const fetchManuals = async () => {
-    try {
-      const res = await fetch("https://api-h-series.telecorp.co.th/api/manual/getbyCode/" + bucode);
-      const data = await res.json();
-      setManuals(data.data || []);
-    } catch (err) {
-      console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    const res = await fetch("https://api-h-series.telecorp.co.th/api/manual/getbyCode/" + bucode);
+    const data = await res.json();
+
+    const sorted = (data.data || []).sort((a, b) => {
+      return new Date(b.createat).getTime() - new Date(a.createat).getTime(); // เรียงจากใหม่ → เก่า
+    });
+
+    setManuals(sorted);
+  } catch (err) {
+    console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     fetchManuals();
@@ -93,7 +99,38 @@ export default function ManualPage() {
       Swal.fire({ icon: "error", title: "เกิดข้อผิดพลาดในการบันทึกข้อมูล", timer: 2000, showConfirmButton: false });
     }
   };
+  const handleDelete = async (manual) => {
+    const confirm = await Swal.fire({
+      title: `คุณแน่ใจหรือไม่?`,
+      text: `ต้องการลบคู่มือ "${manual.name}" หรือไม่`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#e3342f",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "ลบเลย!",
+      cancelButtonText: "ยกเลิก",
+    });
 
+    if (confirm.isConfirmed) {
+      try {
+        const res = await fetch(`https://api-h-series.telecorp.co.th/api/manual/${manual.uid}`, {
+          method: "DELETE",
+        });
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(`Server Error: ${res.status} - ${errorText}`);
+        }
+
+        await fetchManuals();
+        Swal.fire({ icon: "success", title: "ลบข้อมูลเรียบร้อยแล้ว", timer: 2000, showConfirmButton: false });
+      } catch (err) {
+        console.error("เกิดข้อผิดพลาดในการลบข้อมูล:", err);
+        Swal.fire({ icon: "error", title: "เกิดข้อผิดพลาดในการลบข้อมูล", timer: 2000, showConfirmButton: false });
+      }
+    }
+  };
+ 
   return (
     <div className="p-10 max-w-full mx-auto bg-gradient-to-br from-indigo-100 via-pink-50 to-purple-100 dark:from-gray-900 dark:to-gray-800 min-h-screen text-gray-800 dark:text-white">
       <div className="flex justify-between items-center mb-10">
@@ -147,6 +184,13 @@ export default function ManualPage() {
                     >
                       ✏️ แก้ไข
                     </button>
+                    <button
+                      onClick={() => handleDelete(m)}
+                      className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-4 py-1.5 rounded-full text-sm shadow-md transition"
+                    >
+                      🗑️ ลบ
+                    </button>
+
                   </td>
                 </tr>
               ))}

@@ -19,9 +19,14 @@ export default function ManualViewClient() {
 
   const fetchManuals = async () => {
     try {
-      const res = await fetch(`https://api-h-series.telecorp.co.th/api/manual/getbyCode/${bucode}`);
+      const res = await fetch("https://api-h-series.telecorp.co.th/api/manual/getbyCode/" + bucode);
       const data = await res.json();
-      setManuals(data.data || []);
+
+      const sorted = (data.data || []).sort((a, b) => {
+        return new Date(b.createat).getTime() - new Date(a.createat).getTime(); // เรียงจากใหม่ → เก่า
+      });
+
+      setManuals(sorted);
     } catch (err) {
       console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", err);
     }
