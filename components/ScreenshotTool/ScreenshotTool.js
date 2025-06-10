@@ -710,7 +710,7 @@ export default function ScreenshotTool() {
 
             <button
                 onClick={startCapture}
-                className="fixed bottom-2 left-2 z-[9999] w-10 h-10 flex items-center justify-center bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-700 transition-all duration-300"
+                className="no-print fixed bottom-2 left-2 z-[9999] w-10 h-10 flex items-center justify-center bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-700 transition-all duration-300"
                 title="แคปหน้าจอ"
             >
                 📷
@@ -1069,7 +1069,14 @@ export default function ScreenshotTool() {
                     </button>
                 </div>
             )}
-
+            <style jsx>{`
+   @media print {
+  .no-print {
+    display: none !important;
+  }
+   
+}
+      `}</style>
         </>
     );
 }
