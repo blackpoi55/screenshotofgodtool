@@ -629,8 +629,43 @@ export default function ScreenshotTool() {
     // };
 
     const handleSendData = async (payload) => {
+        // ✅ แปลงชื่อ field เป็นภาษาไทย
+        const fieldMap = {
+            title: "หัวข้อปัญหา",
+            description: "รายละเอียด",
+            priority: "ความรุนแรง",
+            url: "ลิงก์หน้าเว็บ",
+            reporter: "ชื่อผู้รายงาน",
+        };
+
+        // ✅ เช็ค required fields ก่อนส่ง
+        const requiredFields = ["title", "description", "priority", "url", "reporter"];
+        const missingFields = requiredFields.filter((field) => !payload[field]?.toString().trim());
+
+        // ✅ แสดง alert ถ้ากรอกไม่ครบ
+        if (missingFields.length > 0) {
+                        Swal.fire({
+                            icon: "warning",
+                            title: "กรุณากรอกข้อมูลให้ครบถ้วน",
+                            html: `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                  <img 
+                    src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGIzeDh2NHAweG8xcmM2eHc4djU3a2Q3YXk4eDRxMW04OWN2cHV6MCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/VbnUQpnihPSIgIXuZv/giphy.gif" 
+                    width="200" 
+                    style="margin-bottom: 10px;" 
+                  />
+                  <p style="margin: 0;">ข้อมูลที่ยังไม่ได้กรอก:</p>
+                  <strong>${missingFields.map((f) => fieldMap[f] || f).join(", ")}</strong>
+                </div>
+              `,
+                            confirmButtonText: "กรอกต่อ",
+                        });
+ 
+            return;
+        }
+
+
         try {
-            // เริ่มโหลด
             setIsLoading(true);
 
             const response = await fetch("https://api-h-series.telecorp.co.th/api/bugreport", {
@@ -638,7 +673,7 @@ export default function ScreenshotTool() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(payload), // ส่ง payload ไปยัง API
+                body: JSON.stringify(payload),
             });
 
             const result = await response.json();
@@ -650,7 +685,6 @@ export default function ScreenshotTool() {
                     icon: "success",
                     title: "ส่งข้อมูลสำเร็จ",
                     text: "ระบบได้รับข้อมูลของคุณเรียบร้อยแล้ว",
-                    confirmButtonText: "ตกลง",
                     showConfirmButton: false,
                     timer: 2000,
                 });
@@ -673,10 +707,10 @@ export default function ScreenshotTool() {
                 text: err.message || "ไม่สามารถส่งข้อมูลได้",
             });
         } finally {
-            // หยุดโหลด
             setIsLoading(false);
         }
     };
+
     const resetScreenshotValue = () => {
         setscreenshotValue({
             title: "",

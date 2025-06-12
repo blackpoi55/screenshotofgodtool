@@ -196,8 +196,8 @@ function page() {
               <th className="p-3 text-left">ความรุนแรง</th>
               <th className="p-3 text-left">ชื่อเคส</th>
               <th className="p-3 text-left">ผู้รายงาน</th>
-              <th className="p-3 text-left">โมดูล</th>
-              <th className="p-3 text-left">URL</th>
+              {/* <th className="p-3 text-left">โมดูล</th>
+              <th className="p-3 text-left">URL</th> */}
               <th className="p-3 text-left">สถานะ</th>
               <th className="p-3 text-center">ดูเพิ่มเติม</th>
             </tr>
@@ -222,8 +222,8 @@ function page() {
                 </td>
                 <td className="p-3">{item.title}</td>
                 <td className="p-3">{item.reporter}</td>
-                <td className="p-3">{item.module}</td>
-                <td className="p-3 max-w-[200px] truncate">{item.url}</td>
+                {/* <td className="p-3 max-w-[200px] truncate">{item.module}</td>
+                <td className="p-3 max-w-[200px] truncate">{item.url}</td> */}
                 <td className="p-3">
                   <span className={getStatusClass(item.status)}>{item.status}</span>
                 </td>
@@ -294,7 +294,7 @@ function page() {
                 </div>
                 <p><strong>ผู้รายงาน:</strong> {selectedCase.reporter}</p>
                 <p><strong>URL:</strong> <a href={selectedCase.url} target="_blank" className="text-blue-600 underline break-all">{selectedCase.url}</a></p>
-                <p><strong>โมดูล:</strong> {selectedCase.module}</p>
+                <p><strong>โมดูล:</strong> <a href={selectedCase.module} target="_blank" className="text-pink-600 underline break-all">คลิกเพื่อวาร์ป(ของระบบ)</a></p>
                 <p><strong>รายละเอียด:</strong></p>
                 <p className="bg-gray-100 p-3 rounded text-sm text-gray-700 whitespace-pre-wrap">{selectedCase.description}</p>
                 <p className="text-sm text-gray-400">🕒 วันที่แจ้ง:  {new Date(selectedCase.createdat).toLocaleString("th-TH", {
