@@ -3,6 +3,7 @@
 import { bucode } from "@/config"
 import { useEffect, useState } from "react"
 import { useRouter } from 'next/navigation'
+import Swal from "sweetalert2"
 const statusOptions = [
   { label: "ทั้งหมด", value: "" },
   { label: "🟡 pending", value: "pending" },
@@ -112,7 +113,6 @@ function page() {
         (c.id.toLowerCase().includes(search) ||
           c.title.toLowerCase().includes(search) ||
           c.description.toLowerCase().includes(search) ||
-          c.priority.toLowerCase().includes(search) ||
           c.module.toLowerCase().includes(search) ||
           c.url.toLowerCase().includes(search) ||
           c.reporter.toLowerCase().includes(search) ||
@@ -194,7 +194,7 @@ function page() {
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
           className="p-3 border border-gray-300 rounded-lg shadow-sm w-full md:w-1/4 focus:outline-none"
-          // disabled={!devmode}
+        // disabled={!devmode}
         >
           {statusOptions.map(opt => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -216,12 +216,13 @@ function page() {
         <table className="min-w-full bg-white">
           <thead>
             <tr className="bg-blue-100 text-gray-700 text-sm uppercase">
-              <th className="p-3 text-left">วันที่แจ้ง</th>
-              <th className="p-3 text-left">ความรุนแรง</th>
-              <th className="p-3 text-left">ชื่อเคส</th>
-              <th className="p-3 text-left">ผู้รายงาน</th>
+               <th className="p-3 text-center w-[50px] min-w-[60px]">คัดลอก ID</th>
+              <th className="p-3 text-left w-[100px] min-w-[160px]">วันที่แจ้ง</th>
+              <th className="p-3 text-left w-[100px] min-w-[120px]">ความรุนแรง</th>
+              <th className="p-3 text-left  ">ชื่อเคส</th>
+              <th className="p-3 text-left w-[100px] min-w-[120px]">ผู้รายงาน</th>
               {/* <th className="p-3 text-left">โมดูล</th>
-              <th className="p-3 text-left">URL</th> */}
+                <th className="p-3 text-left">URL</th> */}
               <th className="p-3 text-left">สถานะ</th>
               <th className="p-3 text-center">ดูเพิ่มเติม</th>
             </tr>
@@ -229,6 +230,23 @@ function page() {
           <tbody className="text-sm text-gray-600">
             {filteredCases.map((item) => (
               <tr key={item.id} className="hover:bg-gray-50 border-b">
+                <td className="p-3 text-center">
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(item.id);
+                      Swal.fire({
+                        icon: "success",
+                        title: "คัดลอกเรียบร้อย",
+                        text: `คัดลอกไอดีของเคส ${item.title} แล้ว`,
+                        timer: 1500,
+                        showConfirmButton: false,
+                      });
+                    }}
+                    className="px-4 py-1 bg-orange-600 text-white rounded-full hover:bg-orange-700 text-xs shadow"
+                  >
+                    💾
+                  </button>
+                </td>
                 <td className="p-3 text-xs break-all">
                   {new Date(item.createdat).toLocaleString("th-TH", {
                     hour12: false,         // ปิดรูปแบบ 12 ชั่วโมง
@@ -246,7 +264,7 @@ function page() {
                 <td className="p-3">{item.title || "-"}</td>
                 <td className="p-3">{item.reporter || "-"}</td>
                 {/* <td className="p-3 max-w-[200px] truncate">{item.module||"-"}</td>
-                <td className="p-3 max-w-[200px] truncate">{item.url||"-"}</td> */}
+                  <td className="p-3 max-w-[200px] truncate">{item.url||"-"}</td> */}
                 <td className="p-3">
                   <span className={getStatusClass(item.status)}>{item.status || "-"}</span>
                 </td>
