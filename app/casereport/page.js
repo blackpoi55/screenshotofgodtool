@@ -2,6 +2,7 @@
 
 import { bucode } from "@/config"
 import { useEffect, useState } from "react"
+import { useRouter } from 'next/navigation'
 const statusOptions = [
   { label: "ทั้งหมด", value: "" },
   { label: "🟡 pending", value: "pending" },
@@ -14,16 +15,40 @@ const sortOptions = [
   { label: "ล่าสุด ⬇️", value: "createdat-desc" },
   { label: "เก่าสุด ⬆️", value: "createdat-asc" }
 ]
+const projectOptions = [
+  { label: "ทุกโปรเจค", value: "" },
+  { label: "Cryoviva Form", value: "form01" },
+  { label: "H-series New", value: "CarevitaAI" },
+  { label: "Test", value: "devtest" }
+]
 function page() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("pending")
+  const [statusFilter, setStatusFilter] = useState("resolved")
   const [sortBy, setSortBy] = useState("createdat-desc")
   const [selectedCase, setSelectedCase] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false)
   const [cases, setCases] = useState([])
+  const [devmode, setdevmode] = useState(true)
+  const router = useRouter()
+
+  // ✅ ย้าย window.location.search เข้า useEffect (ฝั่ง client เท่านั้น)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const searchParams = new URLSearchParams(window.location.search)
+      const godmode = searchParams.get("godmode")
+
+      if (godmode === "admin") {
+        localStorage.setItem("edomdog", "cvf,bo")
+        router.push("/casereport")
+      }
+    }
+  }, [router])
 
   useEffect(() => {
+    const checkmode = localStorage.getItem("edomdog")
+    setdevmode(checkmode === "cvf,bo")
+    setStatusFilter(checkmode === "cvf,bo" ? "pending" : "resolved")
     refresh()
   }, [])
 
@@ -118,10 +143,25 @@ function page() {
         return "bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-semibold";
     }
   };
-
+  const checkProjectname = () => {
+    let project = projectOptions.find((x) => x.value == bucode)
+    return project.label || ""
+  }
   return (
     <div className="flex flex-col gap-6 p-6 bg-gray-50 min-h-screen text-black">
-      <h1 className="text-3xl font-bold text-gray-800">📊 Dashboard Report Case</h1>
+      <div className="flex w-full items-center">
+        <div className="w-1/3 flex justify-start items-center">
+          <h1 className="text-3xl font-bold text-gray-800">📊 Dashboard Report Case </h1>
+        </div>
+        <div className="w-1/3 flex justify-center items-center">
+          <label className=" p-2 bg-pink-500 rounded-lg text-white"> Project : {checkProjectname()}</label>
+        </div>
+        <div className="w-1/3 flex justify-end items-center ">
+          <label className="p-2 bg-green-500 rounded-lg text-white">Mode : {devmode ? "DEV" : "USER"}</label>
+        </div>
+
+      </div>
+
 
       <div className="flex flex-wrap gap-4 text-sm text-gray-700">
         <div className="bg-white px-4 py-2 rounded shadow">
@@ -154,6 +194,7 @@ function page() {
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
           className="p-3 border border-gray-300 rounded-lg shadow-sm w-full md:w-1/4 focus:outline-none"
+          // disabled={!devmode}
         >
           {statusOptions.map(opt => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -248,32 +289,34 @@ function page() {
                 <h2 className="text-2xl font-bold text-gray-800">{selectedCase.title}</h2>
                 <p><strong>ระดับความรุนแรง:</strong> <span className={getpriorityClass(selectedCase.priority)}>{selectedCase.priority || "-"}</span></p>
                 <p><strong>สถานะ:</strong> <span className={getStatusClass(selectedCase.status)}>{selectedCase.status}</span></p>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => handleStatusUpdate(selectedCase, "pending")}
-                    className="px-4 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 text-sm"
-                  >
-                    🟡 Pending
-                  </button>
-                  <button
-                    onClick={() => handleStatusUpdate(selectedCase, "devdone")}
-                    className="px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-                  >
-                    💻 Dev Done
-                  </button>
-                  <button
-                    onClick={() => handleStatusUpdate(selectedCase, "resolved")}
-                    className="px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
-                  >
-                    ✅ Mark Resolved
-                  </button>
-                  <button
-                    onClick={() => handleStatusUpdate(selectedCase, "rejected")}
-                    className="px-4 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
-                  >
-                    ❌ Reject
-                  </button>
-                </div>
+                {devmode ?
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => handleStatusUpdate(selectedCase, "pending")}
+                      className="px-4 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 text-sm"
+                    >
+                      🟡 Pending
+                    </button>
+                    <button
+                      onClick={() => handleStatusUpdate(selectedCase, "devdone")}
+                      className="px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                    >
+                      💻 Dev Done
+                    </button>
+                    <button
+                      onClick={() => handleStatusUpdate(selectedCase, "resolved")}
+                      className="px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                    >
+                      ✅ Mark Resolved
+                    </button>
+                    <button
+                      onClick={() => handleStatusUpdate(selectedCase, "rejected")}
+                      className="px-4 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+                    >
+                      ❌ Reject
+                    </button>
+                  </div>
+                  : ""}
                 <p><strong>ผู้รายงาน:</strong> {selectedCase.reporter}</p>
                 <p><strong>URL:</strong> <a href={selectedCase.url} target="_blank" className="text-blue-600 underline break-all">{selectedCase.url}</a></p>
                 <p><strong>โมดูล:</strong> <a href={selectedCase.module} target="_blank" className="text-pink-600 underline break-all">คลิกเพื่อวาร์ป(ของระบบ)</a></p>
