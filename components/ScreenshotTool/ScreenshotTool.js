@@ -659,7 +659,7 @@ export default function ScreenshotTool() {
                 </div>
               `,
                 showConfirmButton: false,
-                timer: 2000,
+                timer: 5000,
             });
 
             return;
