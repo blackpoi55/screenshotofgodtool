@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import Swal from "sweetalert2";
-import { bucode } from "@/config";
+import { basepath, bucode } from "@/config";
 
 
 export default function ScreenshotTool() {
@@ -28,7 +28,14 @@ export default function ScreenshotTool() {
         "priority": "ต่ำ",
     });
 
+    const [origin, setOrigin] = useState("");
 
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const url = window.location.origin + (basepath || "") + "/casereport";
+            setOrigin(url);
+        }
+    }, []);
     useEffect(() => {
         const canvas = fabricRef.current;
         if (!canvas || !canvasUrl) return;
@@ -750,6 +757,14 @@ export default function ScreenshotTool() {
             >
                 📷
             </button>
+            <button
+                onClick={() =>
+                    window.open(origin, "_blank")
+                }
+                className="fixed bottom-2 left-12 w-10 h-10 bg-green-500 text-white rounded-full shadow-md"
+            >
+                💬
+            </button>
 
 
             {isEditing && (
@@ -956,105 +971,107 @@ export default function ScreenshotTool() {
                     </div>
 
                 </div>
-            )}
+            )
+            }
 
-            {sidePanelOpen && (
-                <div className="fixed right-0 top-0 w-96 h-full bg-white p-4 shadow-lg z-[9999] overflow-y-auto text-black">
-                    <h2 className="font-bold mb-2">📤 ส่งรูปพร้อมข้อมูล</h2>
+            {
+                sidePanelOpen && (
+                    <div className="fixed right-0 top-0 w-96 h-full bg-white p-4 shadow-lg z-[9999] overflow-y-auto text-black">
+                        <h2 className="font-bold mb-2">📤 ส่งรูปพร้อมข้อมูล</h2>
 
-                    {canvasUrl && (
-                        <img
-                            src={canvasUrl}
-                            className="w-full mb-2 border rounded"
-                            alt="screenshot preview"
+                        {canvasUrl && (
+                            <img
+                                src={canvasUrl}
+                                className="w-full mb-2 border rounded"
+                                alt="screenshot preview"
+                            />
+                        )}
+
+                        {/* 📝 title */}
+                        <div className="mb-2">
+                            <select
+                                className="w-full border rounded p-2 mt-1"
+                                value={screenshotValue.title}
+                                onChange={(e) =>
+                                    setscreenshotValue((prev) => ({ ...prev, title: e.target.value }))
+                                }
+                            >
+                                <option value="">-- เลือกหัวข้อปัญหา --</option>
+                                <option value="หน้าเว็บโหลดไม่ขึ้น">🌐 หน้าเว็บโหลดไม่ขึ้น</option>
+                                <option value="หน้าเว็บค้างหรือไม่ตอบสนอง">🌀 หน้าเว็บค้าง / ไม่ตอบสนอง</option>
+                                <option value="เกิด Error หรือแจ้งเตือนผิดปกติ">🚨 Error / แจ้งเตือนผิดปกติ</option>
+                                <option value="ปุ่มหรือฟังก์ชันใช้งานไม่ได้">🔘 ปุ่มหรือฟังก์ชันกดไม่ได้</option>
+                                <option value="กรอกข้อมูลแล้วไม่บันทึก">📥 กรอกข้อมูลแล้วไม่บันทึก</option>
+                                <option value="แสดงผลไม่ถูกต้อง">📊 ข้อมูลแสดงผลผิด</option>
+                                <option value="ปัญหาการเข้าสู่ระบบ">🔐 เข้าสู่ระบบไม่ได้</option>
+                                <option value="โหลดข้อมูลช้า / Time out">🐢 โหลดข้อมูลช้า / Time out</option>
+                                <option value="ระบบล่มทั้งหมด">💥 ระบบล่ม</option>
+                                <option value="อื่น ๆ">✏️ อื่น ๆ (ระบุในรายละเอียด)</option>
+                            </select>
+                        </div>
+
+
+                        {/* 📝 description */}
+                        <textarea
+                            placeholder="รายละเอียด (Description)"
+                            className="w-full border rounded p-2 h-20 mb-2"
+                            value={screenshotValue.description}
+                            onChange={(e) =>
+                                setscreenshotValue((prev) => ({ ...prev, description: e.target.value }))
+                            }
                         />
-                    )}
 
-                    {/* 📝 title */}
-                    <div className="mb-2">
-                        <select
-                            className="w-full border rounded p-2 mt-1"
-                            value={screenshotValue.title}
+
+                        {/* 🚨 ระดับความรุนแรง */}
+                        <div className="mb-2">
+                            <label className="block mb-1 font-medium">ระดับความรุนแรงของปัญหา</label>
+                            <select
+                                className="w-full border rounded p-2"
+                                value={screenshotValue.priority}
+                                onChange={(e) =>
+                                    setscreenshotValue((prev) => ({ ...prev, priority: e.target.value }))
+                                }
+                            >
+                                <option value="ต่ำ">🟢 ต่ำ (Minor)</option>
+                                <option value="ปานกลาง">🟠 ปานกลาง (Moderate)</option>
+                                <option value="สูง">🔴 สูง (Severe)</option>
+                                <option value="วิกฤต">🚨 วิกฤต (Critical)</option>
+                            </select>
+                        </div>
+
+                        {/* 🌐 URL */}
+                        <input
+                            type="text"
+                            placeholder="URL ที่เกี่ยวข้อง"
+                            className="w-full border rounded p-2 mb-2"
+                            value={screenshotValue.url}
                             onChange={(e) =>
-                                setscreenshotValue((prev) => ({ ...prev, title: e.target.value }))
+                                setscreenshotValue((prev) => ({ ...prev, url: e.target.value }))
                             }
-                        >
-                            <option value="">-- เลือกหัวข้อปัญหา --</option>
-                            <option value="หน้าเว็บโหลดไม่ขึ้น">🌐 หน้าเว็บโหลดไม่ขึ้น</option>
-                            <option value="หน้าเว็บค้างหรือไม่ตอบสนอง">🌀 หน้าเว็บค้าง / ไม่ตอบสนอง</option>
-                            <option value="เกิด Error หรือแจ้งเตือนผิดปกติ">🚨 Error / แจ้งเตือนผิดปกติ</option>
-                            <option value="ปุ่มหรือฟังก์ชันใช้งานไม่ได้">🔘 ปุ่มหรือฟังก์ชันกดไม่ได้</option>
-                            <option value="กรอกข้อมูลแล้วไม่บันทึก">📥 กรอกข้อมูลแล้วไม่บันทึก</option>
-                            <option value="แสดงผลไม่ถูกต้อง">📊 ข้อมูลแสดงผลผิด</option>
-                            <option value="ปัญหาการเข้าสู่ระบบ">🔐 เข้าสู่ระบบไม่ได้</option>
-                            <option value="โหลดข้อมูลช้า / Time out">🐢 โหลดข้อมูลช้า / Time out</option>
-                            <option value="ระบบล่มทั้งหมด">💥 ระบบล่ม</option>
-                            <option value="อื่น ๆ">✏️ อื่น ๆ (ระบุในรายละเอียด)</option>
-                        </select>
-                    </div>
+                        />
 
-
-                    {/* 📝 description */}
-                    <textarea
-                        placeholder="รายละเอียด (Description)"
-                        className="w-full border rounded p-2 h-20 mb-2"
-                        value={screenshotValue.description}
-                        onChange={(e) =>
-                            setscreenshotValue((prev) => ({ ...prev, description: e.target.value }))
-                        }
-                    />
-
-
-                    {/* 🚨 ระดับความรุนแรง */}
-                    <div className="mb-2">
-                        <label className="block mb-1 font-medium">ระดับความรุนแรงของปัญหา</label>
-                        <select
-                            className="w-full border rounded p-2"
-                            value={screenshotValue.priority}
+                        {/* 👤 ผู้รายงาน */}
+                        <input
+                            type="text"
+                            placeholder="ชื่อผู้รายงาน (Reporter)"
+                            className="w-full border rounded p-2 mb-2"
+                            value={screenshotValue.reporter}
                             onChange={(e) =>
-                                setscreenshotValue((prev) => ({ ...prev, priority: e.target.value }))
+                                setscreenshotValue((prev) => ({ ...prev, reporter: e.target.value }))
                             }
-                        >
-                            <option value="ต่ำ">🟢 ต่ำ (Minor)</option>
-                            <option value="ปานกลาง">🟠 ปานกลาง (Moderate)</option>
-                            <option value="สูง">🔴 สูง (Severe)</option>
-                            <option value="วิกฤต">🚨 วิกฤต (Critical)</option>
-                        </select>
-                    </div>
+                        />
 
-                    {/* 🌐 URL */}
-                    <input
-                        type="text"
-                        placeholder="URL ที่เกี่ยวข้อง"
-                        className="w-full border rounded p-2 mb-2"
-                        value={screenshotValue.url}
-                        onChange={(e) =>
-                            setscreenshotValue((prev) => ({ ...prev, url: e.target.value }))
-                        }
-                    />
-
-                    {/* 👤 ผู้รายงาน */}
-                    <input
-                        type="text"
-                        placeholder="ชื่อผู้รายงาน (Reporter)"
-                        className="w-full border rounded p-2 mb-2"
-                        value={screenshotValue.reporter}
-                        onChange={(e) =>
-                            setscreenshotValue((prev) => ({ ...prev, reporter: e.target.value }))
-                        }
-                    />
-
-                    {/* ✏️ คอมเมนต์เพิ่มเติม */}
-                    <textarea
-                        placeholder="หมายเหตุเพิ่มเติม..."
-                        className="w-full border rounded p-2 h-20 mb-2"
-                        value={screenshotValue.comment}
-                        onChange={(e) =>
-                            setscreenshotValue((prev) => ({ ...prev, comment: e.target.value }))
-                        }
-                    />
-                    {/* google drive sheet */}
-                    {/* <button
+                        {/* ✏️ คอมเมนต์เพิ่มเติม */}
+                        <textarea
+                            placeholder="หมายเหตุเพิ่มเติม..."
+                            className="w-full border rounded p-2 h-20 mb-2"
+                            value={screenshotValue.comment}
+                            onChange={(e) =>
+                                setscreenshotValue((prev) => ({ ...prev, comment: e.target.value }))
+                            }
+                        />
+                        {/* google drive sheet */}
+                        {/* <button
                         disabled={isLoading}
                         className={`mt-2 px-4 py-2 rounded w-full text-white ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
                         onClick={() => {
@@ -1075,35 +1092,36 @@ export default function ScreenshotTool() {
                         {isLoading ? '⏳ กำลังส่ง...' : '📩 ส่ง'}
                     </button> */}
 
-                    <button
-                        disabled={isLoading}
-                        className={`mt-2 px-4 py-2 rounded w-full text-white ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
-                        onClick={() => {
-                            const payload = {
-                                ...screenshotValue,
-                                module: window.location.href,
-                                screenshotpath: canvasUrl,
-                                bucode: bucode
-                            };
-                            console.log("📩 ส่งข้อมูล:", payload);
-                            handleSendData(payload)
-                            // setSidePanelOpen(false);
-                        }}
-                    >
-                        {isLoading ? '⏳ กำลังส่ง...' : '📩 ส่ง'}
-                    </button>
+                        <button
+                            disabled={isLoading}
+                            className={`mt-2 px-4 py-2 rounded w-full text-white ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+                            onClick={() => {
+                                const payload = {
+                                    ...screenshotValue,
+                                    module: window.location.href,
+                                    screenshotpath: canvasUrl,
+                                    bucode: bucode
+                                };
+                                console.log("📩 ส่งข้อมูล:", payload);
+                                handleSendData(payload)
+                                // setSidePanelOpen(false);
+                            }}
+                        >
+                            {isLoading ? '⏳ กำลังส่ง...' : '📩 ส่ง'}
+                        </button>
 
-                    <button
-                        className="mt-2 bg-red-600 text-white px-4 py-2 rounded w-full hover:bg-red-700"
-                        onClick={() => {
-                            resetScreenshotValue()
-                            setSidePanelOpen(false);
-                        }}
-                    >
-                        ❌ ปิด
-                    </button>
-                </div>
-            )}
+                        <button
+                            className="mt-2 bg-red-600 text-white px-4 py-2 rounded w-full hover:bg-red-700"
+                            onClick={() => {
+                                resetScreenshotValue()
+                                setSidePanelOpen(false);
+                            }}
+                        >
+                            ❌ ปิด
+                        </button>
+                    </div>
+                )
+            }
             <style jsx>{`
    @media print {
   .no-print {
