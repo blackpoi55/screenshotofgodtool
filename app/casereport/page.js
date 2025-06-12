@@ -87,6 +87,7 @@ function page() {
         (c.id.toLowerCase().includes(search) ||
           c.title.toLowerCase().includes(search) ||
           c.description.toLowerCase().includes(search) ||
+          c.priority.toLowerCase().includes(search) ||
           c.module.toLowerCase().includes(search) ||
           c.url.toLowerCase().includes(search) ||
           c.reporter.toLowerCase().includes(search) ||
