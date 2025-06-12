@@ -761,7 +761,7 @@ export default function ScreenshotTool() {
                 onClick={() =>
                     window.open(origin, "_blank")
                 }
-                className="fixed bottom-2 left-12 w-10 h-10 bg-green-500 text-white rounded-full shadow-md"
+                className="no-print fixed bottom-2 left-12 w-10 h-10 bg-green-500 text-white rounded-full shadow-md"
             >
                 💬
             </button>
