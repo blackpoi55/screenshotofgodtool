@@ -159,7 +159,6 @@ function page() {
         <div className="w-1/3 flex justify-end items-center ">
           <label className="p-2 bg-green-500 rounded-lg text-white">Mode : {devmode ? "DEV" : "USER"}</label>
         </div>
-
       </div>
 
 
