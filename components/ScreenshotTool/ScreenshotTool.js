@@ -644,10 +644,10 @@ export default function ScreenshotTool() {
 
         // ✅ แสดง alert ถ้ากรอกไม่ครบ
         if (missingFields.length > 0) {
-                        Swal.fire({
-                            icon: "warning",
-                            title: "กรุณากรอกข้อมูลให้ครบถ้วน",
-                            html: `
+            Swal.fire({
+                icon: "warning",
+                title: "กรุณากรอกข้อมูลให้ครบถ้วน",
+                html: `
                 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
                   <img 
                     src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGIzeDh2NHAweG8xcmM2eHc4djU3a2Q3YXk4eDRxMW04OWN2cHV6MCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/VbnUQpnihPSIgIXuZv/giphy.gif" 
@@ -658,9 +658,10 @@ export default function ScreenshotTool() {
                   <strong>${missingFields.map((f) => fieldMap[f] || f).join(", ")}</strong>
                 </div>
               `,
-                            confirmButtonText: "กรอกต่อ",
-                        });
- 
+                showConfirmButton: false,
+                timer: 2000,
+            });
+
             return;
         }
 

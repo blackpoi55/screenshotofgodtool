@@ -201,12 +201,12 @@ function page() {
                 <td className="p-3">
                   <span className={getpriorityClass(item.priority)}>{item.priority || "-"}</span>
                 </td>
-                <td className="p-3">{item.title}</td>
+                <td className="p-3">{item.title||"-"}</td>
                 {/* <td className="p-3">{item.reporter}</td>
-               <td className="p-3 max-w-[200px] truncate">{item.module}</td>
-                <td className="p-3 max-w-[200px] truncate">{item.url}</td> */}
+               <td className="p-3 max-w-[200px] truncate">{item.module||"-"}</td>
+                <td className="p-3 max-w-[200px] truncate">{item.url||"-"}</td> */}
                 <td className="p-3">
-                  <span className={getStatusClass(item.status)}>{item.status}</span>
+                  <span className={getStatusClass(item.status)}>{item.status||"-"}</span>
                 </td>
                 <td className="p-3 text-center">
                   <button
