@@ -87,7 +87,12 @@ function page() {
       refresh();
       setIsModalOpen(false);
     } else {
-      alert("อัปเดตสถานะไม่สำเร็จ");
+      Swal.fire({
+        icon: "error",
+        title: "อัปเดตสถานะไม่สำเร็จ",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     }
   };
 
@@ -161,10 +166,20 @@ function page() {
 
     const result = await response.json();
     if (result) {
-      alert("บันทึกหมายเหตุสำเร็จ");
+      Swal.fire({
+        icon: "success",
+        title: "บันทึกหมายเหตุสำเร็จ",
+        timer: 2000,
+        showConfirmButton: false,
+      });
       refresh();
     } else {
-      alert("อัปเดตสถานะไม่สำเร็จ");
+      Swal.fire({
+        icon: "error",
+        title: "บันทึกหมายเหตุไม่สำเร็จ",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     }
   };
   return (
