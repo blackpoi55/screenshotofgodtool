@@ -147,6 +147,24 @@ function page() {
     let project = projectOptions.find((x) => x.value == bucode)
     return project.label || ""
   }
+  const updateRemarkClick = async () => {
+    // const res = await updatebugstatus({ status: newStatus }, data.id);
+    const response = await fetch("https://api-h-series.telecorp.co.th/api/bugreport/" + selectedCase?.id, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ s_remarks: selectedCase?.s_remarks, c_remarks: selectedCase?.c_remarks }), // ส่ง payload ไปยัง API
+    });
+
+    const result = await response.json();
+    if (result) {
+      alert("บันทึกหมายเหตุสำเร็จ");
+      refresh();
+    } else {
+      alert("อัปเดตสถานะไม่สำเร็จ");
+    }
+  };
   return (
     <div className="flex flex-col gap-6 p-6 bg-gray-50 min-h-screen text-black">
       <div className="flex w-full items-center">
@@ -215,7 +233,7 @@ function page() {
         <table className="min-w-full bg-white">
           <thead>
             <tr className="bg-blue-100 text-gray-700 text-sm uppercase">
-               <th className="p-3 text-center w-[50px] min-w-[60px]">คัดลอก ID</th>
+              <th className="p-3 text-center w-[50px] min-w-[60px]">คัดลอก ID</th>
               <th className="p-3 text-left w-[100px] min-w-[160px]">วันที่แจ้ง</th>
               <th className="p-3 text-left w-[100px] min-w-[120px]">ความรุนแรง</th>
               <th className="p-3 text-left  ">ชื่อเคส</th>
@@ -301,6 +319,20 @@ function page() {
                   className="w-full h-auto rounded border cursor-pointer hover:shadow-lg transition"
                   onClick={() => setIsImagePreviewOpen(true)}
                 />
+                <p className=" mt-4"><strong>ผู้รายงาน:</strong> {selectedCase.reporter}</p>
+                <p className=" mt-4"><strong>URL:</strong> <a href={selectedCase.url} target="_blank" className="text-blue-600 underline break-all text-[10px]">{selectedCase.url}</a></p>
+                <p className=" mt-4"><strong>โมดูล:</strong> <a href={selectedCase.module} target="_blank" className="text-pink-600 underline break-all">คลิกเพื่อวาร์ป(ของระบบ)</a></p>
+                <p className=" mt-4"><strong>รายละเอียด:</strong></p>
+                <p className="bg-gray-100 p-3 rounded text-sm text-gray-700 whitespace-pre-wrap">{selectedCase.description}</p>
+                <p className="text-sm text-gray-400 mt-10">🕒 วันที่แจ้ง:  {new Date(selectedCase.createdat).toLocaleString("th-TH", {
+                  hour12: false,         // ปิดรูปแบบ 12 ชั่วโมง
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit"
+                })}</p>
               </div>
               <div className="w-full md:w-1/2 space-y-4">
                 <h2 className="text-2xl font-bold text-gray-800">{selectedCase.title}</h2>
@@ -334,20 +366,33 @@ function page() {
                     </button>
                   </div>
                   : ""}
-                <p><strong>ผู้รายงาน:</strong> {selectedCase.reporter}</p>
-                <p><strong>URL:</strong> <a href={selectedCase.url} target="_blank" className="text-blue-600 underline break-all">{selectedCase.url}</a></p>
-                <p><strong>โมดูล:</strong> <a href={selectedCase.module} target="_blank" className="text-pink-600 underline break-all">คลิกเพื่อวาร์ป(ของระบบ)</a></p>
-                <p><strong>รายละเอียด:</strong></p>
-                <p className="bg-gray-100 p-3 rounded text-sm text-gray-700 whitespace-pre-wrap">{selectedCase.description}</p>
-                <p className="text-sm text-gray-400">🕒 วันที่แจ้ง:  {new Date(selectedCase.createdat).toLocaleString("th-TH", {
-                  hour12: false,         // ปิดรูปแบบ 12 ชั่วโมง
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit"
-                })}</p>
+
+                <p><strong>หมายเหตุ (System):</strong></p>
+                {/* <p className="bg-gray-100 p-3 rounded text-sm text-gray-700 whitespace-pre-wrap">{selectedCase.s_remarks}</p> */}
+                <textarea
+                  disabled={!devmode}
+                  placeholder="หมายเหตุ (System)"
+                  className="w-full border rounded p-2 h-20 mb-2"
+                  value={selectedCase.s_remarks}
+                  onChange={(e) =>
+                    setSelectedCase((prev) => ({ ...prev, s_remarks: e.target.value }))
+                  }
+                />
+                <p><strong>หมายเหตุ (Customer):</strong></p>
+                {/* <p className="bg-gray-100 p-3 rounded text-sm text-gray-700 whitespace-pre-wrap">{selectedCase.c_remarks}</p> */}
+                <textarea
+                  disabled={devmode}
+                  placeholder="หมายเหตุ (Customer)"
+                  className="w-full border rounded p-2 h-20 mb-2"
+                  value={selectedCase.c_remarks}
+                  onChange={(e) =>
+                    setSelectedCase((prev) => ({ ...prev, c_remarks: e.target.value }))
+                  }
+                />
+                <button onClick={() => updateRemarkClick()} className="p-2 w-full rounded-2xl bg-green-500 text-center text-white">
+                  บันทึกหมายเหตุ
+                </button>
+
               </div>
             </div>
           </div>
