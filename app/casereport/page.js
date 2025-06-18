@@ -107,28 +107,28 @@ function page() {
   }
 
   const filteredCases = cases
-    .filter((c) => {
-      const search = searchTerm.toLowerCase()
+    ?.filter((c) => {
+      const search = searchTerm.toLowerCase();
       return (
-        (c.id.toLowerCase().includes(search) ||
-          c.title.toLowerCase().includes(search) ||
-          c.description.toLowerCase().includes(search) ||
-          c.module.toLowerCase().includes(search) ||
-          c.url.toLowerCase().includes(search) ||
-          c.reporter.toLowerCase().includes(search) ||
-          c.s_remarks.toLowerCase().includes(search) ||
-          c.c_remarks.toLowerCase().includes(search) ||
-          c.status.toLowerCase().includes(search)) &&
+        ((c.id || "").toLowerCase().includes(search) ||
+          (c.title || "").toLowerCase().includes(search) ||
+          (c.description || "").toLowerCase().includes(search) ||
+          (c.module || "").toLowerCase().includes(search) ||
+          (c.url || "").toLowerCase().includes(search) ||
+          (c.reporter || "").toLowerCase().includes(search) ||
+          (c.s_remarks || "").toLowerCase().includes(search) ||
+          (c.c_remarks || "").toLowerCase().includes(search) ||
+          (c.status || "").toLowerCase().includes(search)) &&
         (statusFilter === "" || c.status === statusFilter)
-      )
+      );
     })
     .sort((a, b) => {
       if (sortBy === "createdat-asc") {
-        return new Date(a.createdat) - new Date(b.createdat)
+        return new Date(a.createdat).getTime() - new Date(b.createdat).getTime();
       } else {
-        return new Date(b.createdat) - new Date(a.createdat)
+        return new Date(b.createdat).getTime() - new Date(a.createdat).getTime();
       }
-    })
+    });
 
   const countByStatus = (status) => cases.filter((c) => c.status === status).length
   const getpriorityClass = (priority) => {
@@ -242,7 +242,7 @@ function page() {
               <th className="p-3 text-left w-[100px] min-w-[120px]">ผู้รายงาน</th>
               {/* <th className="p-3 text-left">โมดูล</th>
                 <th className="p-3 text-left">URL</th> */}
-                <th className="p-3 text-left">หมายเหตุ (system)</th>
+              <th className="p-3 text-left">หมายเหตุ (system)</th>
               <th className="p-3 text-left">สถานะ</th>
               <th className="p-3 text-center">ดูเพิ่มเติม</th>
             </tr>
@@ -283,7 +283,7 @@ function page() {
                 </td>
                 <td className="p-3">{item.title || "-"}</td>
                 <td className="p-3">{item.reporter || "-"}</td>
-                 <td className="p-3">{item.s_remarks || "-"}</td>
+                <td className="p-3">{item.s_remarks || "-"}</td>
                 {/* <td className="p-3 max-w-[200px] truncate">{item.module||"-"}</td>
                   <td className="p-3 max-w-[200px] truncate">{item.url||"-"}</td> */}
                 <td className="p-3">
