@@ -392,7 +392,7 @@ function page() {
                   disabled={!devmode}
                   placeholder="หมายเหตุ (System)"
                   className="w-full border rounded p-2 h-20 mb-2"
-                  value={selectedCase.s_remarks}
+                  value={selectedCase?.s_remarks || ""}
                   onChange={(e) =>
                     setSelectedCase((prev) => ({ ...prev, s_remarks: e.target.value }))
                   }
@@ -403,7 +403,7 @@ function page() {
                   disabled={devmode}
                   placeholder="หมายเหตุ (Customer)"
                   className="w-full border rounded p-2 h-20 mb-2"
-                  value={selectedCase.c_remarks}
+                  value={selectedCase?.c_remarks||""}
                   onChange={(e) =>
                     setSelectedCase((prev) => ({ ...prev, c_remarks: e.target.value }))
                   }
