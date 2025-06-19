@@ -1,2 +1,2 @@
 export const bucode = "devtest"
-export const basepath = ""
+export const subpath = ""

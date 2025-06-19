@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import Swal from "sweetalert2";
-import { basepath, bucode } from "@/config";
+import { subpath, bucode } from "@/config";
 
 
 export default function ScreenshotTool() {
@@ -32,7 +32,7 @@ export default function ScreenshotTool() {
 
     useEffect(() => {
         if (typeof window !== "undefined") {
-            const url = window.location.origin + (basepath || "") + "/casereport";
+            const url = window.location.origin + (subpath || "") + "/casereport";
             setOrigin(url);
         }
     }, []);
