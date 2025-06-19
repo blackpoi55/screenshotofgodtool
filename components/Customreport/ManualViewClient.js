@@ -40,9 +40,9 @@ export default function ManualViewClient() {
       setprojectFilter(data?.data?.bucode);
 
       // 👉 ดึงค่าข้อมูลจริง
-      // const patientRes = await fetch(`https://api-h-series.telecorp.co.th/api/Patient/PatientReport/${manualId}`);
-      // const patientData = await patientRes.json();
-      const patientData = {data:{Sex:"Adisorn"}}
+      const patientRes = await fetch(`https://api-h-series.telecorp.co.th/api/Patient/PatientReport/84995`);
+      const patientData = await patientRes.json();
+      // const patientData = {data:{Sex:"Adisorn"}}
 
       // 👉 แทน key
       const parsed = parseTemplate(data?.data?.detail || "", patientData?.data || {});
@@ -53,13 +53,31 @@ export default function ManualViewClient() {
     }
   };
 
-  // ✨ ฟังก์ชันแทน {{key}} ด้วยข้อมูลจริง
+  // ✨ รองรับ key ซ้อน เช่น trVitalSign.Weight หรือ trLabs[0].ItemDesc
+  const getDeepValue = (obj, path) => {
+    try {
+      const segments = path
+        .replace(/\[(\d+)\]/g, '.$1') // แปลง [0] เป็น .0
+        .split('.');
+
+      return segments.reduce((o, key) => (o && o[key] !== undefined ? o[key] : undefined), obj);
+    } catch (e) {
+      return undefined;
+    }
+  };
+
   const parseTemplate = (template, data) => {
     return template.replace(/{{(.*?)}}/g, (_, key) => {
       const cleanKey = key.trim();
-      return data[cleanKey] ?? `<span style="color:red;">[${cleanKey} not found]</span>`;
+      const value = getDeepValue(data, cleanKey);
+      return value != null && value !== ""
+        ? value
+        : `<span style="color:red;">[${cleanKey} not found]</span>`;
     });
   };
+
+
+
 
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-[#e0f7fa] via-[#fce4ec] to-[#ede7f6] dark:from-gray-900 dark:to-gray-800 text-black dark:text-white transition-all">

@@ -41,15 +41,36 @@ export default function ManualEditClient() {
     try {
       const res = await fetch("https://api-h-series.telecorp.co.th/api/Patient/PatientReport/84995");
       const data = await res.json();
-      console.log(data.data)
-      const keys = Object.keys(data.data);
-      console.log(keys)
-
-      setkeyMap(keys || [])
+      const keys = flattenObject(data.data);
+      setkeyMap(keys || []);
     } catch (err) {
       console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", err);
     }
   };
+
+  function flattenObject(obj, parentKey = '') {
+    let keys = [];
+
+    for (const key in obj) {
+      if (!obj.hasOwnProperty(key)) continue;
+
+      const newKey = parentKey ? `${parentKey}.${key}` : key;
+      const value = obj[key];
+
+      if (Array.isArray(value)) {
+        value.forEach((item, index) => {
+          keys.push(...flattenObject(item, `${newKey}[${index}]`));
+        });
+      } else if (typeof value === 'object' && value !== null) {
+        keys.push(...flattenObject(value, newKey));
+      } else {
+        keys.push(newKey);
+      }
+    }
+
+    return keys;
+  }
+
   const filteredCases = keyMap
     ?.filter((c) => {
       const search = searchKey.toLowerCase();
@@ -99,11 +120,15 @@ export default function ManualEditClient() {
               <button
                 key={index}
                 draggable
-                onDragStart={(e) => e.dataTransfer.setData("text/plain", key)}
+                contentEditable={false} // สำคัญมาก!
+                onDragStart={(e) => {
+                  e.dataTransfer.setData("text/plain", key);
+                }}
                 className="px-3 py-1 bg-green-500 text-white rounded-md shadow hover:bg-green-600 transition m-2 text-xs"
               >
                 {key}
               </button>
+
             ))}
 
           </div>
