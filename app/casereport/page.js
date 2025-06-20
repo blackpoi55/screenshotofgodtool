@@ -20,6 +20,7 @@ const projectOptions = [
   { label: "ทุกโปรเจค", value: "" },
   { label: "Cryoviva Form", value: "form01" },
   { label: "H-series New", value: "CarevitaAI" },
+  { label: "Cryoviva Inventory", value: "Inventory" },
   { label: "Test", value: "devtest" }
 ]
 function page() {
