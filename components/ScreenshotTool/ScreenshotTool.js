@@ -25,7 +25,7 @@ export default function ScreenshotTool() {
         "url": "",
         "reporter": "",
         "screenshotpath": "",
-        "priority": "ต่ำ",
+        "priority": "4 ต่ำ",
     });
 
     const [origin, setOrigin] = useState("");
@@ -727,7 +727,7 @@ export default function ScreenshotTool() {
             url: "",
             reporter: "",
             screenshotpath: "",
-            priority: "ต่ำ",
+            priority: "4 ต่ำ",
             assignees: [], // ✅ ใส่ตรงนี้ด้วย
         });
     };
@@ -1032,10 +1032,10 @@ export default function ScreenshotTool() {
                                     setscreenshotValue((prev) => ({ ...prev, priority: e.target.value }))
                                 }
                             >
-                                <option value="ต่ำ">🟢 ต่ำ (Minor)</option>
-                                <option value="ปานกลาง">🟠 ปานกลาง (Moderate)</option>
-                                <option value="สูง">🔴 สูง (Severe)</option>
-                                <option value="วิกฤต">🚨 วิกฤต (Critical)</option>
+                                <option value="1 วิกฤติ">1 วิกฤติ</option>
+                                <option value="2 สูง">2 สูง</option>
+                                <option value="3 ปานกลาง">3 ปานกลาง</option>
+                                <option value="4 ต่ำ">4 ต่ำ</option>
                             </select>
                         </div>
 
