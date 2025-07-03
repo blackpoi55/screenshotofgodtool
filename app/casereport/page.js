@@ -139,14 +139,14 @@ function page() {
   const countByStatus = (status) => cases.filter((c) => c.status === status).length
   const getpriorityClass = (priority) => {
     switch (priority) {
-    case "1 วิกฤติ":
-        return "bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold";
-      case "2 สูง":
-        return "bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-semibold";
-      case "3 ปานกลาง":
-        return "bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-semibold";
-      case "4 ต่ำ":
+      case "1 วิกฤติ":
         return "bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold";
+      case "2 สูง":
+        return "bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-semibold";
+      case "3 ปานกลาง":
+        return "bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-semibold";
+      case "4 ต่ำ":
+        return "bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold";
       default:
         return "bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-semibold";
     }
@@ -404,7 +404,7 @@ function page() {
                   disabled={devmode}
                   placeholder="หมายเหตุ (Customer)"
                   className="w-full border rounded p-2 h-20 mb-2"
-                  value={selectedCase?.c_remarks||""}
+                  value={selectedCase?.c_remarks || ""}
                   onChange={(e) =>
                     setSelectedCase((prev) => ({ ...prev, c_remarks: e.target.value }))
                   }
