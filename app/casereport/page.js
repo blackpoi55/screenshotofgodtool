@@ -1,30 +1,13 @@
 'use client'
 
-import { bucode } from "@/config"
+import { bucode, statusOptions, sortOptions, priorityOptions, projectOptions, devOptions } from "@/config"
 import { useEffect, useState } from "react"
 import { useRouter } from 'next/navigation'
 import Swal from "sweetalert2"
-const statusOptions = [
-  { label: "ทั้งหมด", value: "" },
-  { label: "🟡 pending", value: "pending" },
-  { label: "💻 Dev Done", value: "devdone" },
-  { label: "✅ resolved", value: "resolved" },
-  { label: "❌ rejected", value: "rejected" }
-]
 
-const sortOptions = [
-  { label: "ล่าสุด ⬇️", value: "createdat-desc" },
-  { label: "เก่าสุด ⬆️", value: "createdat-asc" }
-]
-const projectOptions = [
-  { label: "ทุกโปรเจค", value: "" },
-  { label: "Cryoviva Form", value: "form01" },
-  { label: "H-series New", value: "CarevitaAI" },
-  { label: "Cryoviva Inventory", value: "Inventory" },
-  { label: "Test", value: "devtest" }
-]
 function page() {
   const [searchTerm, setSearchTerm] = useState("")
+  const [prioritFilter, setprioritFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("resolved")
   const [sortBy, setSortBy] = useState("createdat-desc")
   const [selectedCase, setSelectedCase] = useState(null)
@@ -100,43 +83,18 @@ function page() {
   const getStatusClass = (status) => {
     switch (status) {
       case "resolved":
-        return "bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold"
+        return "bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold";
       case "devdone":
         return "bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-semibold"
       case "pending":
-        return "bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-semibold"
+        return "bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-semibold";
       case "rejected":
-        return "bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold"
+        return "bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold";
       default:
-        return "bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-semibold"
+        return "bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-semibold";
     }
-  }
+  };
 
-  const filteredCases = cases
-    ?.filter((c) => {
-      const search = searchTerm.toLowerCase();
-      return (
-        ((c.id || "").toLowerCase().includes(search) ||
-          (c.title || "").toLowerCase().includes(search) ||
-          (c.description || "").toLowerCase().includes(search) ||
-          (c.module || "").toLowerCase().includes(search) ||
-          (c.url || "").toLowerCase().includes(search) ||
-          (c.reporter || "").toLowerCase().includes(search) ||
-          (c.s_remarks || "").toLowerCase().includes(search) ||
-          (c.c_remarks || "").toLowerCase().includes(search) ||
-          (c.status || "").toLowerCase().includes(search)) &&
-        (statusFilter === "" || c.status === statusFilter)
-      );
-    })
-    .sort((a, b) => {
-      if (sortBy === "createdat-asc") {
-        return new Date(a.createdat).getTime() - new Date(b.createdat).getTime();
-      } else {
-        return new Date(b.createdat).getTime() - new Date(a.createdat).getTime();
-      }
-    });
-
-  const countByStatus = (status) => cases.filter((c) => c.status === status).length
   const getpriorityClass = (priority) => {
     switch (priority) {
       case "1 วิกฤติ":
@@ -151,37 +109,67 @@ function page() {
         return "bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-semibold";
     }
   };
-  const checkProjectname = () => {
-    let project = projectOptions.find((x) => x.value == bucode)
-    return project.label || ""
-  }
-  const updateRemarkClick = async () => {
-    // const res = await updatebugstatus({ status: newStatus }, data.id);
-    const response = await fetch("https://api-h-series.telecorp.co.th/api/bugreport/" + selectedCase?.id, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ s_remarks: selectedCase?.s_remarks, c_remarks: selectedCase?.c_remarks }), // ส่ง payload ไปยัง API
+
+  const filteredCases = cases
+    ?.filter((c) => {
+      const search = searchTerm.toLowerCase();
+      return (
+        ((c.id || "").toLowerCase().includes(search) ||
+          (c.title || "").toLowerCase().includes(search) ||
+          (c.description || "").toLowerCase().includes(search) ||
+          (c.module || "").toLowerCase().includes(search) ||
+          (c.url || "").toLowerCase().includes(search) ||
+          (c.reporter || "").toLowerCase().includes(search) ||
+          (c.s_remarks || "").toLowerCase().includes(search) ||
+          (c.c_remarks || "").toLowerCase().includes(search) ||
+          (c.status || "").toLowerCase().includes(search)) &&
+        (statusFilter === "" || c.status === statusFilter) &&
+        (prioritFilter === "" || c.priority === prioritFilter) &&
+        (devFilter === "" || (c.person ? c.person.split(",").includes(devFilter) : false))
+      );
+    })
+    .sort((a, b) => {
+      if (sortBy === "createdat-asc") {
+        return new Date(a.createdat).getTime() - new Date(b.createdat).getTime();
+      } else {
+        return new Date(b.createdat).getTime() - new Date(a.createdat).getTime();
+      }
     });
 
-    const result = await response.json();
-    if (result) {
-      Swal.fire({
-        icon: "success",
-        title: "บันทึกหมายเหตุสำเร็จ",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-      refresh();
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "บันทึกหมายเหตุไม่สำเร็จ",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-    }
+
+  const countByStatus = (status) =>
+    cases?.filter((c) => c.status === status).length;
+  const checkProjectname = () => {
+    let project = projectOptions.find((x) => x.value == bucode)
+    return project?.label || ""
+  }
+  const toggle = (value) => {
+    const exists = devList.includes(value);
+    const newList = exists
+      ? devList.filter((v) => v !== value)
+      : [...devList, value];
+    setSelectedDev(newList.join(","));
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const value = e.dataTransfer.getData("text/plain");
+    if (!value || devList.includes(value)) return;
+    setSelectedDev([...devList, value].join(","));
+  };
+
+  const handleDragStart = (index) => () => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (index) => (e) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+    const reordered = [...devList];
+    const [moved] = reordered.splice(draggedIndex, 1);
+    reordered.splice(index, 0, moved);
+    setDraggedIndex(index);
+    setSelectedDev(reordered.join(","));
   };
   return (
     <div className="flex flex-col gap-6 p-6 bg-gray-50 min-h-screen text-black">
@@ -195,12 +183,11 @@ function page() {
         <div className="w-1/3 flex justify-end items-center ">
           <label className="p-2 bg-green-500 rounded-lg text-white">Mode : {devmode ? "DEV" : "USER"}</label>
         </div>
+
       </div>
-
-
       <div className="flex flex-wrap gap-4 text-sm text-gray-700">
         <div className="bg-white px-4 py-2 rounded shadow">
-          รวมทั้งหมด: <strong>{cases.length}</strong> เคส
+          รวมทั้งหมด: <strong>{cases?.length}</strong> เคส
         </div>
         <div className="bg-yellow-50 px-4 py-2 rounded shadow text-yellow-800">
           🟡 Pending: <strong>{countByStatus("pending")}</strong>
@@ -224,7 +211,27 @@ function page() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="p-3 border border-gray-300 rounded-lg shadow-sm w-full md:w-1/2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-
+        <select
+          value={prioritFilter}
+          onChange={(e) => setprioritFilter(e.target.value)}
+          className="p-3 border border-gray-300 rounded-lg shadow-sm w-full md:w-1/4 focus:outline-none"
+        // disabled={!devmode}
+        >
+          {priorityOptions.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+        <select
+          value={devFilter}
+          onChange={(e) => setdevFilter(e.target.value)}
+          className="p-3 border border-gray-300 rounded-lg shadow-sm w-full md:w-1/4 focus:outline-none"
+        // disabled={!devmode}
+        >
+          <option value={""}>เลือกผู้ดูแล</option>
+          {devOptions.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
@@ -235,7 +242,6 @@ function page() {
             <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
         </select>
-
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
@@ -252,21 +258,23 @@ function page() {
           <thead>
             <tr className="bg-blue-100 text-gray-700 text-sm uppercase">
               <th className="p-3 text-center w-[50px] min-w-[60px]">คัดลอก ID</th>
+              <th className="p-3 text-center w-[50px] min-w-[60px]">#</th>
               <th className="p-3 text-left w-[100px] min-w-[160px]">วันที่แจ้ง</th>
               <th className="p-3 text-left w-[100px] min-w-[120px]">ความรุนแรง</th>
               <th className="p-3 text-left  ">ชื่อเคส</th>
               <th className="p-3 text-left w-[100px] min-w-[120px]">ผู้รายงาน</th>
               {/* <th className="p-3 text-left">โมดูล</th>
-                <th className="p-3 text-left">URL</th> */}
+              <th className="p-3 text-left">URL</th> */}
               <th className="p-3 text-left">หมายเหตุ (system)</th>
+              <th className="p-3 text-left">ผู้ดูแล</th>
               <th className="p-3 text-left">สถานะ</th>
               <th className="p-3 text-center">ดูเพิ่มเติม</th>
             </tr>
           </thead>
           <tbody className="text-sm text-gray-600">
-            {filteredCases.map((item) => (
+            {filteredCases?.map((item, index) => (
               <tr key={item.id} className="hover:bg-gray-50 border-b">
-                <td className="p-3 text-center">
+                <td className="p-3 ">
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(item.id);
@@ -283,6 +291,7 @@ function page() {
                     💾
                   </button>
                 </td>
+                <td className="p-3 text-center">{index + 1}</td>
                 <td className="p-3 text-xs break-all">
                   {new Date(item.createdat).toLocaleString("th-TH", {
                     hour12: false,         // ปิดรูปแบบ 12 ชั่วโมง
@@ -300,8 +309,33 @@ function page() {
                 <td className="p-3">{item.title || "-"}</td>
                 <td className="p-3">{item.reporter || "-"}</td>
                 <td className="p-3">{item.s_remarks || "-"}</td>
+                <td className="p-3">
+                  <div className="flex">
+                    {(item.person ? item.person.split(",") : []).map((value, index) => {
+                      const item = devOptions.find((x) => x.value === value);
+                      if (!item) return null;
+
+                      return (
+                        <div
+                          key={value}
+                          draggable
+                          onDragStart={handleDragStart(index)}
+                          onDragOver={handleDragOver(index)}
+                          className={`flex flex-col items-center justify-center ${item.color} text-white text-xs p-2 rounded-full w-10 h-10 shadow-md mr-1`}
+                        >
+                          {/* ✅ SVG แสดงด้วย dangerouslySetInnerHTML */}
+                          {item.image && (
+                            <span
+                              className="w-3 h-3"
+                              dangerouslySetInnerHTML={{ __html: item.image }}
+                            />
+                          )}
+                          <span className="truncate">{item.label}</span>
+                        </div>
+                      );
+                    })}</div></td>
                 {/* <td className="p-3 max-w-[200px] truncate">{item.module||"-"}</td>
-                  <td className="p-3 max-w-[200px] truncate">{item.url||"-"}</td> */}
+                <td className="p-3 max-w-[200px] truncate">{item.url||"-"}</td> */}
                 <td className="p-3">
                   <span className={getStatusClass(item.status)}>{item.status || "-"}</span>
                 </td>
@@ -309,6 +343,7 @@ function page() {
                   <button
                     className="px-4 py-1 bg-blue-600 text-white rounded-full hover:bg-blue-700 text-xs shadow"
                     onClick={() => {
+                      setSelectedDev(item?.person || "");
                       setSelectedCase(item)
                       setIsModalOpen(true)
                     }}
@@ -316,6 +351,7 @@ function page() {
                     ดูรายละเอียด
                   </button>
                 </td>
+
               </tr>
             ))}
           </tbody>
@@ -359,32 +395,111 @@ function page() {
                 <p><strong>ระดับความรุนแรง:</strong> <span className={getpriorityClass(selectedCase.priority)}>{selectedCase.priority || "-"}</span></p>
                 <p><strong>สถานะ:</strong> <span className={getStatusClass(selectedCase.status)}>{selectedCase.status}</span></p>
                 {devmode ?
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => handleStatusUpdate(selectedCase, "pending")}
-                      className="px-4 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 text-sm"
-                    >
-                      🟡 Pending
-                    </button>
-                    <button
-                      onClick={() => handleStatusUpdate(selectedCase, "devdone")}
-                      className="px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-                    >
-                      💻 Dev Done
-                    </button>
-                    <button
-                      onClick={() => handleStatusUpdate(selectedCase, "resolved")}
-                      className="px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
-                    >
-                      ✅ Mark Resolved
-                    </button>
-                    <button
-                      onClick={() => handleStatusUpdate(selectedCase, "rejected")}
-                      className="px-4 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
-                    >
-                      ❌ Reject
-                    </button>
-                  </div>
+                  <>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => handleStatusUpdate(selectedCase, "pending")}
+                        className="px-4 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 text-sm"
+                      >
+                        🟡 Pending
+                      </button>
+                      <button
+                        onClick={() => handleStatusUpdate(selectedCase, "devdone")}
+                        className="px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                      >
+                        💻 Dev Done
+                      </button>
+                      <button
+                        onClick={() => handleStatusUpdate(selectedCase, "resolved")}
+                        className="px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                      >
+                        ✅ Mark Resolved
+                      </button>
+                      <button
+                        onClick={() => handleStatusUpdate(selectedCase, "rejected")}
+                        className="px-4 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+                      >
+                        ❌ Reject
+                      </button>
+                    </div>
+                    <div className="w-full max-w-md space-y-4">
+                      <p className="font-semibold text-gray-800">ผู้ดูแลเคส (Developer):</p>
+
+                      {/* Selected Devs */}
+                      <div
+                        onDrop={handleDrop}
+                        onDragOver={(e) => e.preventDefault()}
+                        className="flex flex-wrap gap-2 border border-dashed border-blue-400 p-3 rounded-lg bg-blue-50 min-h-[56px]"
+                      >
+                        {devList.length === 0 && (
+                          <span className="text-sm text-blue-400 italic">
+                            ลาก Dev มาวางตรงนี้...
+                          </span>
+                        )}
+                        {devList.map((value, index) => {
+                          const item = devOptions.find((x) => x.value === value);
+                          if (!item) return null;
+
+                          return (
+                            <div
+                              key={value}
+                              draggable
+                              onDragStart={handleDragStart(index)}
+                              onDragOver={handleDragOver(index)}
+                              className={`flex items-center ${item.color} text-white text-sm pl-3 pr-2 py-1 rounded-full shadow-md transition-all cursor-move`}
+                            >
+                              {/* ✅ SVG แสดงด้วย dangerouslySetInnerHTML */}
+                              {item.image && (
+                                <span
+                                  className="w-5 h-5 mr-2"
+                                  dangerouslySetInnerHTML={{ __html: item.image }}
+                                />
+                              )}
+                              <span className="truncate">{item.label}</span>
+                              <button
+                                onClick={() => toggle(value)}
+                                className="ml-2 w-5 h-5 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 transition text-xs"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          );
+                        })}
+
+                      </div>
+
+                      {/* Choices - Drag to select */}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {devOptions
+                          .filter((item) => !devList.includes(item.value))
+                          .map((item) => (
+                            <div
+                              key={item.value}
+                              draggable
+                              onDragStart={(e) => e.dataTransfer.setData("text/plain", item.value)}
+                              className="flex items-center gap-2 px-4 py-2 rounded-xl border text-sm cursor-grab bg-white border-gray-300 hover:border-blue-500 shadow hover:shadow-md transition-all group"
+                            >
+                              {/* SVG Icon */}
+                              {item.image && (
+                                <span
+                                  className="w-5 h-5 group-hover:scale-110 transition-transform"
+                                  dangerouslySetInnerHTML={{ __html: item.image }}
+                                />
+                              )}
+                              <span className="truncate font-medium text-gray-800 group-hover:text-blue-600">
+                                {item.label}
+                              </span>
+                            </div>
+                          ))}
+                      </div>
+
+                      {/* Debug display */}
+                      <div className="text-xs text-gray-400 italic">
+                        selectedDev: <code>{selectedDev || "—"}</code>
+                      </div>
+                    </div>
+
+                  </>
                   : ""}
 
                 <p><strong>หมายเหตุ (System):</strong></p>
@@ -393,7 +508,7 @@ function page() {
                   disabled={!devmode}
                   placeholder="หมายเหตุ (System)"
                   className="w-full border rounded p-2 h-20 mb-2"
-                  value={selectedCase?.s_remarks || ""}
+                  value={selectedCase.s_remarks}
                   onChange={(e) =>
                     setSelectedCase((prev) => ({ ...prev, s_remarks: e.target.value }))
                   }
@@ -404,7 +519,7 @@ function page() {
                   disabled={devmode}
                   placeholder="หมายเหตุ (Customer)"
                   className="w-full border rounded p-2 h-20 mb-2"
-                  value={selectedCase?.c_remarks || ""}
+                  value={selectedCase.c_remarks}
                   onChange={(e) =>
                     setSelectedCase((prev) => ({ ...prev, c_remarks: e.target.value }))
                   }
