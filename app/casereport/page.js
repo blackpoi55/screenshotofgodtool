@@ -83,7 +83,35 @@ function page() {
       });
     }
   };
+  
+  const updateRemarkClick = async () => {
+    // const res = await updatebugstatus({ status: newStatus }, data.id);
+    const response = await fetch("https://api-h-series.telecorp.co.th/api/bugreport/" + selectedCase?.id, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ s_remarks: selectedCase?.s_remarks, c_remarks: selectedCase?.c_remarks, person: selectedDev }), // ส่ง payload ไปยัง API
+    });
 
+    const result = await response.json();
+    if (result) {
+      Swal.fire({
+        icon: "success",
+        title: "บันทึกหมายเหตุสำเร็จ",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      refresh();
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "บันทึกหมายเหตุไม่สำเร็จ",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    }
+  };
   const getStatusClass = (status) => {
     switch (status) {
       case "resolved":
@@ -522,7 +550,7 @@ function page() {
 
                         return (
                           <div
-                            key={value} 
+                            key={value}
                             className={`flex items-center ${item.color} text-white text-sm pl-3 pr-2 py-1 rounded-full shadow-md transition-all cursor-move`}
                           >
                             {/* ✅ SVG แสดงด้วย dangerouslySetInnerHTML */}
@@ -532,7 +560,7 @@ function page() {
                                 dangerouslySetInnerHTML={{ __html: item.image }}
                               />
                             )}
-                            <span className="truncate">{item.label}</span> 
+                            <span className="truncate">{item.label}</span>
                           </div>
                         );
                       })}
