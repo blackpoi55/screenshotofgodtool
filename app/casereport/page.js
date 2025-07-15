@@ -6,14 +6,18 @@ import { useRouter } from 'next/navigation'
 import Swal from "sweetalert2"
 
 function page() {
-  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedDev, setSelectedDev] = useState("");
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const devList = selectedDev ? selectedDev.split(",") : [];
+  const [searchTerm, setSearchTerm] = useState("");
   const [prioritFilter, setprioritFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("resolved")
-  const [sortBy, setSortBy] = useState("createdat-desc")
-  const [selectedCase, setSelectedCase] = useState(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false)
-  const [cases, setCases] = useState([])
+  const [devFilter, setdevFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("resolved");
+  const [sortBy, setSortBy] = useState("createdat-desc");
+  const [selectedCase, setSelectedCase] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
+  const [cases, setCases] = useState([]);
   const [devmode, setdevmode] = useState(true)
   const router = useRouter()
 
@@ -500,7 +504,41 @@ function page() {
                     </div>
 
                   </>
-                  : ""}
+                  : <div className="w-full max-w-md space-y-4">
+                    <p className="font-semibold text-gray-800">ผู้ดูแลเคส (Developer):</p>
+
+                    {/* Selected Devs */}
+                    <div
+                      className="flex flex-wrap gap-2 border border-dashed border-blue-400 p-3 rounded-lg bg-blue-50 min-h-[56px]"
+                    >
+                      {devList.length === 0 && (
+                        <span className="text-sm text-blue-400 italic">
+                          ยังไม่ได้กำหนดผู้ดูแลเคส
+                        </span>
+                      )}
+                      {devList.map((value, index) => {
+                        const item = devOptions.find((x) => x.value === value);
+                        if (!item) return null;
+
+                        return (
+                          <div
+                            key={value} 
+                            className={`flex items-center ${item.color} text-white text-sm pl-3 pr-2 py-1 rounded-full shadow-md transition-all cursor-move`}
+                          >
+                            {/* ✅ SVG แสดงด้วย dangerouslySetInnerHTML */}
+                            {item.image && (
+                              <span
+                                className="w-5 h-5 mr-2"
+                                dangerouslySetInnerHTML={{ __html: item.image }}
+                              />
+                            )}
+                            <span className="truncate">{item.label}</span> 
+                          </div>
+                        );
+                      })}
+
+                    </div>
+                  </div>}
 
                 <p><strong>หมายเหตุ (System):</strong></p>
                 {/* <p className="bg-gray-100 p-3 rounded text-sm text-gray-700 whitespace-pre-wrap">{selectedCase.s_remarks}</p> */}
@@ -508,7 +546,7 @@ function page() {
                   disabled={!devmode}
                   placeholder="หมายเหตุ (System)"
                   className="w-full border rounded p-2 h-20 mb-2"
-                  value={selectedCase.s_remarks}
+                  value={selectedCase.s_remarks || ""}
                   onChange={(e) =>
                     setSelectedCase((prev) => ({ ...prev, s_remarks: e.target.value }))
                   }
@@ -519,7 +557,7 @@ function page() {
                   disabled={devmode}
                   placeholder="หมายเหตุ (Customer)"
                   className="w-full border rounded p-2 h-20 mb-2"
-                  value={selectedCase.c_remarks}
+                  value={selectedCase.c_remarks || ""}
                   onChange={(e) =>
                     setSelectedCase((prev) => ({ ...prev, c_remarks: e.target.value }))
                   }
