@@ -391,8 +391,8 @@ function page() {
       </div>
 
       {isModalOpen && selectedCase && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl p-8 relative animate-fadeIn">
+           <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[9999] ">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl p-8 relative animate-fadeIn max-h-[85vh] overflow-x-auto">
             <button
               onClick={() => setIsModalOpen(false)}
               className="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl"
