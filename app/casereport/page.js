@@ -83,7 +83,7 @@ function page() {
       });
     }
   };
-  
+
   const updateRemarkClick = async () => {
     // const res = await updatebugstatus({ status: newStatus }, data.id);
     const response = await fetch("https://api-h-series.telecorp.co.th/api/bugreport/" + selectedCase?.id, {
@@ -353,7 +353,8 @@ function page() {
                           draggable
                           onDragStart={handleDragStart(index)}
                           onDragOver={handleDragOver(index)}
-                          className={`flex flex-col items-center justify-center ${item.color} text-white text-xs p-2 rounded-full w-10 h-10 shadow-md mr-1`}
+                          style={{ backgroundColor: item.color || "black", color: item.textcolor || "white" }}
+                          className={`flex flex-col items-center justify-center text-xs p-2 rounded-full w-10 h-10 shadow-md mr-1`}
                         >
                           {/* ✅ SVG แสดงด้วย dangerouslySetInnerHTML */}
                           {item.image && (
@@ -391,7 +392,7 @@ function page() {
       </div>
 
       {isModalOpen && selectedCase && (
-           <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[98] ">
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[98] ">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl p-8 relative animate-fadeIn max-h-[85vh] overflow-x-auto">
             <button
               onClick={() => setIsModalOpen(false)}
@@ -478,7 +479,8 @@ function page() {
                               draggable
                               onDragStart={handleDragStart(index)}
                               onDragOver={handleDragOver(index)}
-                              className={`flex items-center ${item.color} text-white text-sm pl-3 pr-2 py-1 rounded-full shadow-md transition-all cursor-move`}
+                              style={{ backgroundColor: item.color || "black", color: item.textcolor || "white" }}
+                              className={`flex items-center text-sm pl-3 pr-2 py-1 rounded-full shadow-md transition-all cursor-move`}
                             >
                               {/* ✅ SVG แสดงด้วย dangerouslySetInnerHTML */}
                               {item.image && (
@@ -551,7 +553,8 @@ function page() {
                         return (
                           <div
                             key={value}
-                            className={`flex items-center ${item.color} text-white text-sm pl-3 pr-2 py-1 rounded-full shadow-md transition-all cursor-move`}
+                            style={{ backgroundColor: item.color || "black", color: item.textcolor || "white" }}
+                            className={`flex items-center text-sm pl-3 pr-2 py-1 rounded-full shadow-md transition-all cursor-move`}
                           >
                             {/* ✅ SVG แสดงด้วย dangerouslySetInnerHTML */}
                             {item.image && (
