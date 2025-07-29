@@ -25,6 +25,7 @@ export const projectOptions = [
     { label: "Cryoviva Form", value: "form01" },
     { label: "H-series New", value: "CarevitaAI" },
     { label: "Cryoviva Inventory", value: "Inventory" },
+    { label: "Cryoviva Sale App", value: "SaleApp" },
     { label: "Test", value: "devtest" }
 ]
 // https://icons8.com/icons/set/characters--style-color

@@ -64,6 +64,42 @@ export default function ScreenshotTool() {
         }
     }, []);
 
+    useEffect(() => {
+        const handlePasteImage = async () => {
+            try {
+                const items = await navigator.clipboard.read();
+                for (const item of items) {
+                    if (item.types.includes("image/png")) {
+                        const blob = await item.getType("image/png");
+                        const dataUrl = URL.createObjectURL(blob);
+
+                        // ตั้งค่าภาพไปที่ editor
+                        setCanvasUrl(dataUrl);
+
+                        // โหลดขนาดภาพเพื่อตั้งค่า canvas
+                        const img = new Image();
+                        img.onload = () => {
+                            setCanvasSize({ width: img.width, height: img.height });
+                            setIsEditing(true); // เปิดโหมดแก้ไข
+                        };
+                        img.src = dataUrl;
+                    }
+                }
+            } catch (err) {
+                console.error("ไม่สามารถอ่านภาพจาก Clipboard:", err);
+            }
+        };
+
+        const keyListener = (e) => {
+            // ✅ รองรับ Ctrl+V (กรณีกด PrintScreen แล้วกด Paste เอง)
+            if (e.ctrlKey && (e.key === "b" || e.key === "B" || e.key === "ิ" || e.key === "ฺ")) {
+                handlePasteImage();
+            }
+        };
+
+        document.addEventListener("keydown", keyListener);
+        return () => document.removeEventListener("keydown", keyListener);
+    }, []);
 
     useEffect(() => {
         const key = (e) => {
@@ -753,7 +789,7 @@ export default function ScreenshotTool() {
             <button
                 onClick={startCapture}
                 className="no-print fixed bottom-2 left-2 z-[9999] w-10 h-10 flex items-center justify-center bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-700 transition-all duration-300"
-                title="แคปหน้าจอ"
+                title="แคปหน้าจอ (Ctrl+Q) วางรูปภาพ (Ctrl+B)"
             >
                 📷
             </button>
