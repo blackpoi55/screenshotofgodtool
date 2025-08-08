@@ -1,6 +1,6 @@
 // ManualPage.jsx
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Swal from "sweetalert2";
 import { bucode } from "@/config";
@@ -19,6 +19,7 @@ export default function ManualPage() {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState({ open: false, mode: "add", data: null });
   const [formData, setFormData] = useState({ name: "", detail: "", bucode: "", createby: "" });
+  const [query, setQuery] = useState("");
   const [projectFilter, setprojectFilter] = useState(bucode)
   const fetchManuals = async () => {
     try {
@@ -135,17 +136,38 @@ export default function ManualPage() {
       }
     }
   };
-
+  const filteredManuals = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return manuals;
+    return manuals.filter((m) =>
+      [
+        m?.name ?? "",
+        m?.bucode ?? "",
+        m?.createby ?? "",
+        new Date(m?.createat).toLocaleString() ?? ""
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(q)
+    );
+  }, [manuals, query]);
   return (
     <div className="p-10 max-w-full mx-auto bg-gradient-to-br from-indigo-100 via-pink-50 to-purple-100 dark:from-gray-900 dark:to-gray-800 min-h-screen text-gray-800 dark:text-white">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
         {/* Title */}
         <h1 className="text-3xl md:text-4xl font-extrabold text-purple-700 dark:text-white tracking-tight flex items-center gap-2">
-          📚 <span>รายการคู่มือทั้งหมด</span>
+          📚 <span>รายการคู่มือทั้งหมด ({filteredManuals.length||0})</span>
         </h1>
 
         {/* Filter + Button */}
         <div className="flex flex-col sm:flex-row items-stretch gap-3 w-full md:w-auto">
+          {/* ช่องค้นหา */}
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="ค้นหาชื่อ / BU / ผู้สร้าง"
+            className="p-3 border border-gray-300 rounded-lg shadow-sm w-full sm:w-72 focus:outline-none text-black"
+          />
           <select
             value={projectFilter}
             onChange={(e) => setprojectFilter(e.target.value)}
@@ -176,6 +198,7 @@ export default function ManualPage() {
           <table className="min-w-full text-sm">
             <thead className="bg-purple-100 dark:bg-gray-700 text-purple-800 dark:text-white rounded-t-3xl">
               <tr>
+                <th className="p-4 text-left">#</th>
                 <th className="p-4 text-left">ชื่อ</th>
                 <th className="p-4 text-left">BU Code</th>
                 <th className="p-4 text-left">ผู้สร้าง</th>
@@ -184,8 +207,9 @@ export default function ManualPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-purple-100 dark:divide-gray-700">
-              {manuals.map((m) => (
+              {filteredManuals.map((m, index) => (
                 <tr key={m.uid} className="hover:bg-purple-50 dark:hover:bg-gray-800 transition">
+                  <td className="p-4">{index + 1}</td>
                   <td className="p-4">{m.name}</td>
                   <td className="p-4">{m.bucode}</td>
                   <td className="p-4">{m.createby}</td>

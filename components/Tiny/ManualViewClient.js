@@ -9,6 +9,7 @@ export default function ManualViewClient() {
   const id = searchParams.get("id");
   const [manuals, setManuals] = useState([]);
   const [projectFilter, setprojectFilter] = useState()
+  const [query, setQuery] = useState("");
   useEffect(() => {
     fetchManuals();
   }, [projectFilter]);
@@ -42,31 +43,45 @@ export default function ManualViewClient() {
       console.error("โหลดข้อมูลล้มเหลว:", error);
     }
   };
-
+  const filteredManuals = manuals.filter(m =>
+    (m.name || "").toLowerCase().includes(query.toLowerCase())
+  );
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-[#e0f7fa] via-[#fce4ec] to-[#ede7f6] dark:from-gray-900 dark:to-gray-800 text-black dark:text-white transition-all">
       {/* Sidebar */}
       <aside className="w-80 bg-white/40 dark:bg-white/10 backdrop-blur-xl p-6 border-r border-purple-200 dark:border-gray-700 shadow-2xl z-10 rounded-tr-3xl rounded-br-3xl">
         <h2 className="text-3xl font-extrabold mb-6 text-purple-700 dark:text-white flex items-center gap-2 tracking-tight">
-          📘 <span>คู่มือระบบ</span>
+          📘 <span>คู่มือระบบ ({filteredManuals.length||0})</span>
         </h2>
+        {/* Search */}
+        <div className="mb-4">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="ค้นหาเอกสาร..."
+            className="w-full rounded-xl px-4 py-2 bg-white/70 dark:bg-gray-800 border border-purple-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-400"
+          />
+        </div>
         <div className="flex flex-col gap-4 overflow-y-auto max-h-[80vh] pr-1 custom-scroll">
-          {manuals.map((m) => (
+          {filteredManuals.map((m) => (
             <button
               key={m.uid}
               onClick={() => getData(m.uid)}
-              className={`text-left px-5 py-3 rounded-2xl font-semibold text-base transition-all border relative group overflow-hidden shadow-md
-                ${value?.uid === m.uid
+              className={`text-left flex items-start px-5 py-3 pr-8 rounded-2xl font-semibold text-base leading-6 whitespace-normal break-words transition-all border relative group shadow-md
+    ${value?.uid === m.uid
                   ? "bg-gradient-to-r from-purple-500 to-indigo-400 text-white border-purple-500 shadow-lg"
                   : "bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 hover:bg-purple-100 dark:hover:bg-gray-700 border-gray-300"}
-              `}
+  `}
             >
-              <span className="relative z-10">{m.name}</span>
+              <span className="relative z-10 block whitespace-normal break-words text-sm">
+                {m.name}
+              </span>
+
               {value?.uid === m.uid && (
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white font-bold">★</span>
               )}
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-2xl" />
             </button>
+
           ))}
         </div>
       </aside>
